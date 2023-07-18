@@ -1,6 +1,8 @@
 #include<iostream>
 using namespace std;
 
+#define delimitr "\n------------------------------------------------------------------------------\n"
+
 class Human
 {
 protected:
@@ -114,12 +116,68 @@ public:
 		cout << speciality << " " << group << " " << rating << " " << attendance << endl;
 	}
 };
+
+class Teacher :public Human //добавил 3 отличия от Human, специальность, стаж работы, ставка
+{
+	std::string profession;
+	int work_experience;
+	double rate;
+public:
+	const std::string& get_profession() const
+	{
+		return profession;
+	}
+	int get_work_experence() const
+	{
+		return work_experience;
+	}
+	double get_rate() const
+	{
+		return rate;
+	}
+	void set_profession(const std::string& profession)
+	{
+		this->profession = profession;
+	}
+	void set_work_experience(int work_experience)
+	{
+		this->work_experience = work_experience;
+	}
+	void set_rate(double rate)
+	{
+		this->rate = rate;
+	}
+
+	//					Constructors
+	Teacher(const std::string& last_name, const std::string& first_name, int age, const std::string& profession, int work_experience, double rate) :
+		Human(last_name, first_name, age)
+	{
+		set_profession(profession);
+		set_work_experience(work_experience);
+		set_rate(rate);
+		cout << "TConstructor:\t" << this << endl;
+	}
+	~Teacher()
+	{
+		cout << "TDestructor:\t" << this << endl;
+	}
+	void print() const
+	{
+		Human::print();
+		cout << profession << " " << work_experience << " " << rate << endl;
+	}
+};
 void main()
 {
 	setlocale(LC_ALL, "");
 	Human human("Montana", "Antonio", 30);
 	human.print();
+	cout << delimitr;
 
 	Student stud("Pinkman", "Jessie", 25, "Chemistry", "WW_220", 95, 98);
 	stud.print();
+	cout << delimitr;
+
+	Teacher teach("Poliancsky", "Dmitrii", 52, "mathematician", 20, 1);
+	teach.print();
 }
