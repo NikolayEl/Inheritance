@@ -1,4 +1,4 @@
-#include<iostream>
+п»ї#include<iostream>
 using namespace std;
 
 #define delimitr "\n------------------------------------------------------------------------------\n"
@@ -117,7 +117,7 @@ public:
 	}
 };
 
-class Teacher :public Human //добавил 3 отличия от Human, специальность, стаж работы, ставка
+class Teacher :public Human //РґРѕР±Р°РІРёР» 3 РѕС‚Р»РёС‡РёСЏ РѕС‚ Human, СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚СЊ, СЃС‚Р°Р¶ СЂР°Р±РѕС‚С‹, СЃС‚Р°РІРєР°
 {
 	std::string profession;
 	int work_experience;
