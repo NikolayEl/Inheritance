@@ -149,7 +149,8 @@ public:
 	}
 
 	//					Constructors
-	Teacher(const std::string& last_name, const std::string& first_name, int age, const std::string& profession, int work_experience, double rate) :
+	Teacher(const std::string& last_name, const std::string& first_name, int age, 
+		const std::string& profession, int work_experience, double rate):
 		Human(last_name, first_name, age)
 	{
 		set_profession(profession);
@@ -218,8 +219,8 @@ public:
 	}
 
 	//					Constructors
-	Gradute(const std::string& last_name, const std::string& first_name, int age, const std::string& speciality,
-		const std::string& group, double raiting, double attendance,
+	Gradute(const std::string& last_name, const std::string& first_name, int age, 
+		const std::string& speciality, const std::string& group, double raiting, double attendance,
 		const std::string& thesis, const std::string& graduation_date, int diploma_assessment, int total_hours, double GPA) :
 		Student(last_name, first_name, age, speciality, group, raiting, attendance)
 	{
