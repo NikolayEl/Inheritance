@@ -167,6 +167,81 @@ public:
 		cout << profession << " " << work_experience << " " << rate << endl;
 	}
 };
+
+class Gradute :public Student
+{
+	std::string thesis;
+	std::string graduation_date;
+	int diploma_assessment;
+	int total_hours;
+	double GPA; //Grade Point Average 
+public:
+	const std::string& get_thesis() const
+	{
+		return thesis;
+	}
+	const std::string& get_graduation_date() const
+	{
+		return graduation_date;
+	}
+	int get_diploma_assessment() const
+	{
+		return diploma_assessment;
+	}
+	int get_total_hours() const
+	{
+		return total_hours;
+	}
+	double get_GPA() const
+	{
+		return GPA;
+	}
+	void set_thesis(const std::string& thesis)
+	{
+		this->thesis = thesis;
+	}
+	void set_graduation_date(const std::string& graduation_date)
+	{
+		this->graduation_date = graduation_date;
+	}
+	void set_diploma_assessment(int diploma_assessment)
+	{
+		this->diploma_assessment = diploma_assessment;
+	}
+	void set_total_hours(int total_hours)
+	{
+		this->total_hours = total_hours;
+	}
+	void set_GPA(double GPA)
+	{
+		this->GPA = GPA;
+	}
+
+	//					Constructors
+	Gradute(const std::string& last_name, const std::string& first_name, int age, const std::string& speciality,
+		const std::string& group, double raiting, double attendance,
+		const std::string& thesis, const std::string& graduation_date, int diploma_assessment, int total_hours, double GPA) :
+		Student(last_name, first_name, age, speciality, group, raiting, attendance)
+	{
+		set_thesis(thesis);
+		set_graduation_date(graduation_date);
+		set_diploma_assessment(diploma_assessment);
+		set_total_hours(total_hours);
+		set_GPA(GPA);
+		cout << "GConstructor:\t" << this << endl;
+	}
+	~Gradute()
+	{
+		cout << "GDestructor:\t" << this << endl;
+	}
+
+	void print() const
+	{
+		Student::print();
+		cout << thesis << " " << graduation_date << " " << diploma_assessment << " " << total_hours << " " << GPA << endl;
+	}
+
+};
 void main()
 {
 	setlocale(LC_ALL, "");
@@ -174,10 +249,27 @@ void main()
 	human.print();
 	cout << delimitr;
 
-	Student stud("Pinkman", "Jessie", 25, "Chemistry", "WW_220", 95, 98);
+	Student stud
+	(
+		"Pinkman", "Jessie", 25, 
+		"Chemistry", "WW_220", 95, 98
+	);
 	stud.print();
 	cout << delimitr;
 
-	Teacher teach("Poliancsky", "Dmitrii", 52, "mathematician", 20, 1);
+	Teacher teach
+	(
+		"Poliancsky", "Dmitrii", 52,
+		"mathematician", 20, 1
+	);
 	teach.print();
+	cout << delimitr;
+
+	Gradute grad1
+	(
+		"Pinkman", "Jessie", 25, 
+		"Programmer", "WW_220", 95, 98, 
+		"Monitoring algorithm of the state of the data transmission network", "27.05.2023", 5, 8160, 4.73
+	);
+	grad1.print();
 }
