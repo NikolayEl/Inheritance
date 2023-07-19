@@ -43,12 +43,12 @@ public:
 		set_age(age);
 		cout << "HConstructor:\t" << this << endl;
 	}
-	~Human()
+	virtual ~Human()
 	{
 		cout << "HDestructor:\t" << this << endl;
 	}
 
-	void print() const
+	virtual void print() const
 	{
 		cout << last_name << " " << first_name << " " << age << endl;
 	}
@@ -243,16 +243,28 @@ public:
 	}
 
 };
+//#define HOME_WORK
+
+std::ostream& operator<<(std::ostream& out, const Human& obj)
+{
+	return out << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age() << endl;
+}
+std::ostream& operator<<(std::ostream& out, const Student& obj)
+{
+	return out << obj.get_speciality() << " " << obj.get_group() << " " << obj.get_raiting() << " " << obj.get_attendance() << endl;
+}
+
 void main()
 {
 	setlocale(LC_ALL, "");
+#ifdef HOME_WORK
 	Human human("Montana", "Antonio", 30);
 	human.print();
 	cout << delimitr;
 
 	Student stud
 	(
-		"Pinkman", "Jessie", 25, 
+		"Pinkman", "Jessie", 25,
 		"Chemistry", "WW_220", 95, 98
 	);
 	stud.print();
@@ -268,9 +280,46 @@ void main()
 
 	Gradute grad1
 	(
-		"Pinkman", "Jessie", 25, 
-		"Programmer", "WW_220", 95, 98, 
+		"Pinkman", "Jessie", 25,
+		"Programmer", "WW_220", 95, 98,
 		"Monitoring algorithm of the state of the data transmission network", "27.05.2023", 5, 8160, 4.73
 	);
 	grad1.print();
+#endif // HOME_WORK
+
+
+	Human* group[] =
+	{
+		// UPCAST
+		new Student
+		(
+			"Pinkman", "Jessie", 25,
+			"Chemistry", "WW_220", 95, 98
+		),
+		new Teacher
+		(
+			"Poliancsky", "Dmitrii", 52,
+			"mathematician", 20, 1
+		),
+		new Gradute
+		(
+			"Pinkman", "Jessie", 25,
+			"Programmer", "WW_220", 95, 98,
+			"Monitoring algorithm of the state of the data transmission network", "27.05.2023", 5, 8160, 4.73
+		)
+
+	};
+	cout << delimitr;
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++) 
+	{
+		cout << typeid(*group[i]).name() << ":\n";
+		/*group[i]->print();*/
+		//cout << *group[i] << endl;
+		//if(typeid(*group[i]) == typeid(Student)) dynamic
+		cout << delimitr;
+	}
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+	{
+		delete group[i];
+	}
 }
