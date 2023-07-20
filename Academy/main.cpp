@@ -251,14 +251,6 @@ public:
 };
 //#define HOME_WORK
 
-//std::ostream& operator<<(std::ostream& out, const Human& obj)
-//{
-//	return out << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age() << endl;
-//}
-//std::ostream& operator<<(std::ostream& out, const Student& obj)
-//{
-//	return out << obj.get_speciality() << " " << obj.get_group() << " " << obj.get_raiting() << " " << obj.get_attendance() << endl;
-//}
 
 
 void main()
@@ -336,3 +328,11 @@ std::ostream& operator<<(std::ostream& out, const Human& obj)
 {
 	return obj.print(out);
 }
+//std::ostream& operator<<(std::ostream& out, const Human& obj)
+//{
+//	return out << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age() << endl;
+//}
+//std::ostream& operator<<(std::ostream& out, const Student& obj)
+//{
+//	return out << obj.get_speciality() << " " << obj.get_group() << " " << obj.get_raiting() << " " << obj.get_attendance() << endl;
+//}
