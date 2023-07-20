@@ -3,6 +3,12 @@ using namespace std;
 
 #define delimitr "\n------------------------------------------------------------------------------\n"
 
+class Human;
+class Student;
+class Teacher;
+class Gradute;
+
+std::ostream& operator<<(std::ostream& out, const Human& obj);
 class Human
 {
 protected:
@@ -48,9 +54,9 @@ public:
 		cout << "HDestructor:\t" << this << endl;
 	}
 
-	virtual void print() const
+	virtual std::ostream& print(std::ostream& out) const
 	{
-		cout << last_name << " " << first_name << " " << age << endl;
+		return out << last_name << " " << first_name << " " << age ;
 	}
 };
 
@@ -110,10 +116,10 @@ public:
 		cout << "SDestructor:\t" << this << endl;
 	}
 
-	void print()const
+	std::ostream& print(std::ostream& out)const
 	{
-		Human::print();
-		cout << speciality << " " << group << " " << rating << " " << attendance << endl;
+		Human::print(out) << " ";
+		return out << speciality << " " << group << " " << rating << " " << attendance;
 	}
 };
 
@@ -162,10 +168,10 @@ public:
 	{
 		cout << "TDestructor:\t" << this << endl;
 	}
-	void print() const
+	std::ostream& print(std::ostream& out) const
 	{
-		Human::print();
-		cout << profession << " " << work_experience << " " << rate << endl;
+		Human::print(out) << " ";
+		return out << profession << " " << work_experience << " " << rate;
 	}
 };
 
@@ -236,23 +242,24 @@ public:
 		cout << "GDestructor:\t" << this << endl;
 	}
 
-	void print() const
+	std::ostream& print(std::ostream& out) const
 	{
-		Student::print();
-		cout << thesis << " " << graduation_date << " " << diploma_assessment << " " << total_hours << " " << GPA << endl;
+		Student::print(out) << " ";
+		return out << thesis << " " << graduation_date << " " << diploma_assessment << " " << total_hours << " " << GPA;
 	}
 
 };
 //#define HOME_WORK
 
-std::ostream& operator<<(std::ostream& out, const Human& obj)
-{
-	return out << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age() << endl;
-}
-std::ostream& operator<<(std::ostream& out, const Student& obj)
-{
-	return out << obj.get_speciality() << " " << obj.get_group() << " " << obj.get_raiting() << " " << obj.get_attendance() << endl;
-}
+//std::ostream& operator<<(std::ostream& out, const Human& obj)
+//{
+//	return out << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age() << endl;
+//}
+//std::ostream& operator<<(std::ostream& out, const Student& obj)
+//{
+//	return out << obj.get_speciality() << " " << obj.get_group() << " " << obj.get_raiting() << " " << obj.get_attendance() << endl;
+//}
+
 
 void main()
 {
@@ -315,11 +322,17 @@ void main()
 		cout << typeid(*group[i]).name() << ":\n";
 		/*group[i]->print();*/
 		//cout << *group[i] << endl;
-		//if(typeid(*group[i]) == typeid(Student)) dynamic
+		//if(typeid(*group[i]) == typeid(Student)) //dynamic
+		//cout << *dynamic_cast<Student*>(group[i]) << endl;
+		cout << *group[i] << endl;
 		cout << delimitr;
 	}
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		delete group[i];
 	}
+}
+std::ostream& operator<<(std::ostream& out, const Human& obj)
+{
+	return obj.print(out);
 }
