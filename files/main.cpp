@@ -7,7 +7,7 @@ using std::cout;
 using std::endl;
 
 //#define WRITE_TO_FILE
-#define READ_FROM_FILE
+//#define READ_FROM_FILE
 
 
 void main()
@@ -37,7 +37,14 @@ void main()
 	if (fin.is_open())
 	{
 		//TODO: read file
-
+		while (!fin.eof())
+		{
+			const int SIZE = 10256;
+			char sz_buffer[SIZE] = {};
+			//fin >> sz_buffer;
+			fin.getline(sz_buffer, SIZE);
+			cout << sz_buffer << endl;
+		}
 		//Закрываем поток
 		fin.close();
 	}

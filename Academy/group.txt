@@ -1,0 +1,3 @@
+Pinkman     Jessie      25   Chemistry             WW_220    95      98      
+Poliancsky  Dmitrii     52   mathematician         20   1    
+Pinkman     Jessie      25   Programmer            WW_220    95      98      
