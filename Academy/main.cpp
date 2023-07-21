@@ -1,5 +1,6 @@
 ﻿#include<iostream>
 #include<fstream>
+#include<string>
 using namespace std;
 
 #define delimitr "\n------------------------------------------------------------------------------\n"
@@ -236,6 +237,13 @@ public:
 
 class Gradute :public Student
 {
+protected:
+	static const int THESIS_WIDTH = 30;
+	static const int GRADUATION_WIDTH = 10;
+	static const int DIPLOMA_WIDTH = 15;
+	static const int HOURS_WIDTH = 7;
+	static const int GPA_WIDTH = 9;
+private:
 	std::string thesis;
 	std::string graduation_date;
 	int diploma_assessment;
@@ -305,6 +313,22 @@ public:
 	{
 		Student::print(out) << " ";
 		return out << thesis << " " << graduation_date << " " << diploma_assessment << " " << total_hours << " " << GPA;
+	}
+	std::ofstream& print(std::ofstream& ofs)const
+	{
+		Student::print(ofs);
+		//static const int THESIS_WIDTH = 30;
+		//static const int GRADUATION_WIDTH = 10;
+		//static const int DIPLOMA_WIDTH = 15;
+		//static const int HOURS_WIDTH = 7;
+		//static const int GPA_WIDTH = 9;
+		ofs.width(THESIS_WIDTH);
+		ofs << thesis;
+		ofs.width(GRADUATION_WIDTH);
+		ofs << graduation_date;
+		//ofs.width(RATE_WIDTH);
+		//ofs << rate;
+		return ofs;
 	}
 
 };
@@ -407,4 +431,28 @@ void save(Human** group, const int n, const string filename)
 	std::string command = "start notepad ";
 	command += filename;
 	system(command.c_str());
+}
+
+Human** load(const std::string& filename, int& n)
+{
+	n = 0;
+	Human** group = nullptr;
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+		for(n = 0;!fin.eof(); n++)
+		{
+			std::string buffer;
+			std::getline(fin, buffer);
+		}
+		//2) Выделяем память под массив
+		group = new Human * [--n] {};
+
+		fin.close();
+	}
+	else
+	{
+		std::cerr << "Error: file not found" << endl;
+	}
+	return group;
 }
