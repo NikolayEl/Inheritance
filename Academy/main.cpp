@@ -14,6 +14,8 @@ std::ostream& operator<<(std::ostream& out, const Human& obj);
 std::ofstream& operator<<(std::ofstream& ofs, const Human& obj);
 void print(Human** group, const int n);
 void save(Human** group, const int n, const string file);
+Human** load(const std::string& filename);
+//string remove_spaces(string line);
 class Human
 {
 protected:
@@ -72,6 +74,7 @@ public:
 	}
 	virtual std::ofstream& print(std::ofstream& ofs) const
 	{
+		ofs << typeid(*this).name() << ": \t";
 		ofs.width(LAST_NAME_WIDTH);
 		ofs << std::left;
 		ofs << last_name;
@@ -238,9 +241,9 @@ public:
 class Gradute :public Student
 {
 protected:
-	static const int THESIS_WIDTH = 30;
-	static const int GRADUATION_WIDTH = 10;
-	static const int DIPLOMA_WIDTH = 15;
+	static const int THESIS_WIDTH = 70;
+	static const int GRADUATION_WIDTH = 6;
+	static const int DIPLOMA_WIDTH = 5;
 	static const int HOURS_WIDTH = 7;
 	static const int GPA_WIDTH = 9;
 private:
@@ -294,14 +297,14 @@ public:
 	//					Constructors
 	Gradute(const std::string& last_name, const std::string& first_name, int age, 
 		const std::string& speciality, const std::string& group, double raiting, double attendance,
-		const std::string& thesis, const std::string& graduation_date, int diploma_assessment, int total_hours, double GPA) :
+		const std::string& thesis/*, const std::string& graduation_date, int diploma_assessment, int total_hours, double GPA*/) :
 		Student(last_name, first_name, age, speciality, group, raiting, attendance)
 	{
 		set_thesis(thesis);
-		set_graduation_date(graduation_date);
+		/*set_graduation_date(graduation_date);
 		set_diploma_assessment(diploma_assessment);
 		set_total_hours(total_hours);
-		set_GPA(GPA);
+		set_GPA(GPA);*/
 		cout << "GConstructor:\t" << this << endl;
 	}
 	~Gradute()
@@ -312,22 +315,21 @@ public:
 	std::ostream& print(std::ostream& out) const
 	{
 		Student::print(out) << " ";
-		return out << thesis << " " << graduation_date << " " << diploma_assessment << " " << total_hours << " " << GPA;
+		return out << thesis /*<< " " << graduation_date << " " << diploma_assessment << " " << total_hours << " " << GPA*/;
 	}
 	std::ofstream& print(std::ofstream& ofs)const
 	{
 		Student::print(ofs);
-		//static const int THESIS_WIDTH = 30;
-		//static const int GRADUATION_WIDTH = 10;
-		//static const int DIPLOMA_WIDTH = 15;
-		//static const int HOURS_WIDTH = 7;
-		//static const int GPA_WIDTH = 9;
 		ofs.width(THESIS_WIDTH);
 		ofs << thesis;
-		ofs.width(GRADUATION_WIDTH);
-		ofs << graduation_date;
-		//ofs.width(RATE_WIDTH);
-		//ofs << rate;
+		//ofs.width(GRADUATION_WIDTH);
+		//ofs << graduation_date;
+		//ofs.width(DIPLOMA_WIDTH);
+		//ofs << diploma_assessment;
+		//ofs.width(HOURS_WIDTH);
+		//ofs << total_hours;
+		//ofs.width(GPA_WIDTH);
+		//ofs << GPA;
 		return ofs;
 	}
 
@@ -387,12 +389,17 @@ void main()
 		(
 			"Pinkman", "Jessie", 25,
 			"Programmer", "WW_220", 95, 98,
-			"Monitoring algorithm of the state of the data transmission network", "27.05.2023", 5, 8160, 4.73
+			"Monitoring algorithm of the state of the data transmission network"/*, "27.05.2023", 5, 8160, 4.73*/
 		)
 
 	};
 	print(group, sizeof(group) / sizeof(group[0]));
 	save(group, sizeof(group) / sizeof(group[0]), "group.txt");
+	Human** group2 = new Human * [3] {};
+	group2 = load("group.txt");
+	Human* group3[3];
+	for (int i = 0; i < 3; i++) group3[i] = group2[i];
+	print(group3, sizeof(group3) / sizeof(group3[0]));
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		delete group[i];
@@ -413,7 +420,7 @@ void print(Human** group, const int n)
 	cout << delimitr;
 	for (int i = 0; i < n; i++)
 	{
-		cout << typeid(*group[i]).name() << ":\n";
+		cout << typeid(*group[i]).name() << ": \t";
 		/*group[i]->print();*/
 		//cout << *group[i] << endl;
 		//if(typeid(*group[i]) == typeid(Student)) //dynamic
@@ -426,16 +433,19 @@ void print(Human** group, const int n)
 void save(Human** group, const int n, const string filename)
 {
 	std::ofstream fout(filename);
-	for (int i = 0; i < n; i++) fout << *group[i] << endl;
+	for (int i = 0; i < n; i++)
+	{
+		fout << *group[i] << endl;
+	}
 	fout.close();
 	std::string command = "start notepad ";
 	command += filename;
 	system(command.c_str());
 }
 
-Human** load(const std::string& filename, int& n)
+Human** load(const std::string& filename)
 {
-	n = 0;
+	int n = 0;
 	Human** group = nullptr;
 	std::ifstream fin(filename);
 	if (fin.is_open())
@@ -447,7 +457,46 @@ Human** load(const std::string& filename, int& n)
 		}
 		//2) Выделяем память под массив
 		group = new Human * [--n] {};
+		string line;
+		string word[10];
+		int count = 0;
+		fin.close();
+		std::ifstream fin(filename);
+		while (getline(fin, line))
+		{
+			string temp_line = line;
 
+			int position = 0;
+			position = temp_line.find(" ", 0);
+			temp_line = temp_line.substr(position + 1);
+			position = temp_line.find(" ", 0);
+			word[0] = temp_line.substr(0, position - 1);
+			temp_line = temp_line.substr(position + 2);
+			int size;
+			if (word[0] == "Human")size = 4;
+			if (word[0] == "Student")size = 9;
+			if (word[0] == "Teacher")size = 7;
+			if (word[0] == "Gradute")size = 10;
+			for (int i = 1; i < size; i++)
+			{
+				if (temp_line == "") break;
+				if (i == 8 && size == 10)
+				{
+					word[9] = temp_line;
+					break;
+				}
+				position = temp_line.find(" ", 0);
+				word[i] = temp_line.substr(0, position);
+				temp_line = temp_line.substr(position + 1);
+				if (word[i] == " " or word[i] == "") i--;
+			}
+			if (word[0] == "Human")group[count] = new Human(word[1], word[2], stoi(word[3]));
+			if (word[0] == "Student")group[count] = new Student(word[1], word[2], stoi(word[3]), word[4], word[5], stoi(word[6]), stoi(word[7]));
+			if (word[0] == "Teacher")group[count] = new Teacher(word[1], word[2], stoi(word[3]), word[4], stoi(word[5]), stof(word[6]));
+			if (word[0] == "Gradute")group[count] = new Gradute(word[1], word[2], stoi(word[3]), word[4], word[5], stoi(word[6]), stoi(word[7]), word[8]);
+			count++;
+			//for (int i = 0; i < 10;i++)word[i].clear();
+		}
 		fin.close();
 	}
 	else
