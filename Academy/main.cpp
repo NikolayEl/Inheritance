@@ -489,6 +489,11 @@ Human** load(const std::string& filename)
 				if (i == 8 && size == 10 )
 				{
 					word[8] = temp_line;
+					for (int k = 0; k < word[8].size(); k++) if (word[8][k] == ' ' && word[8][k + 1] != ' ')
+					{
+						word[8] = word[8].substr(k + 1);
+						break;
+					}
 					break;
 				}
 				position = temp_line.find(" ", 0);
