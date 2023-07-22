@@ -4,6 +4,7 @@
 using namespace std;
 
 #define delimitr "\n------------------------------------------------------------------------------\n"
+int counter;
 
 class Human;
 class Student;
@@ -60,6 +61,7 @@ public:
 		set_first_name(first_name);
 		set_age(age);
 		count++;
+		counter++;
 		cout << "HConstructor:\t" << this << endl;
 	}
 	virtual ~Human()
@@ -375,6 +377,10 @@ void main()
 	Human* group[] =
 	{
 		// UPCAST
+		new Human 
+		(
+			"Proba", "Probovich", 40
+		),
 		new Student
 		(
 			"Pinkman", "Jessie", 25,
@@ -395,11 +401,11 @@ void main()
 	};
 	print(group, sizeof(group) / sizeof(group[0]));
 	save(group, sizeof(group) / sizeof(group[0]), "group.txt");
-	Human** group2 = new Human * [3] {};
+	Human** group2 = new Human * [counter] {};
+	counter = 0;
 	group2 = load("group.txt");
-	Human* group3[3];
-	for (int i = 0; i < 3; i++) group3[i] = group2[i];
-	print(group3, sizeof(group3) / sizeof(group3[0]));
+	cout << counter << endl;
+	print(group2, counter);
 	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
 		delete group[i];
@@ -480,9 +486,9 @@ Human** load(const std::string& filename)
 			for (int i = 1; i < size; i++)
 			{
 				if (temp_line == "") break;
-				if (i == 8 && size == 10)
+				if (i == 8 && size == 10 )
 				{
-					word[9] = temp_line;
+					word[8] = temp_line;
 					break;
 				}
 				position = temp_line.find(" ", 0);

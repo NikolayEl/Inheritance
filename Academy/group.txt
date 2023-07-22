@@ -1,3 +1,4 @@
+class Human: 	Proba       Probovich   40   
 class Student: 	Pinkman     Jessie      25   Chemistry             WW_220    95      98      
 class Teacher: 	Poliancsky  Dmitrii     52   mathematician         20   1    
 class Gradute: 	Pinkman     Jessie      25   Programmer            WW_220    95      98      Monitoring algorithm of the state of the data transmission network    
