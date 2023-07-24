@@ -62,7 +62,7 @@ void load(const std::string filename, std::string*& line, const int counter)
 	}
 	else
 	{
-		std::cerr << "Errror: File not found" << endl;
+		std::cerr << "Error: File not found" << endl;
 		fin.close();
 	}
 }

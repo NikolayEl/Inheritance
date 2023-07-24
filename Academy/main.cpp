@@ -15,7 +15,9 @@ std::ostream& operator<<(std::ostream& out, const Human& obj);
 std::ofstream& operator<<(std::ofstream& ofs, const Human& obj);
 void print(Human** group, const int n);
 void save(Human** group, const int n, const string file);
-Human** load(const std::string& filename);
+Human** load(const std::string& filename, int& n);
+Human* HumanFactory(const std::string& type);
+std::ifstream& operator>>(std::ifstream& ifs, Human& obj);
 //string remove_spaces(string line);
 class Human
 {
@@ -87,6 +89,11 @@ public:
 		ofs << std::left;
 		ofs << age;
 		return ofs;
+	}
+	virtual std::ifstream& scan(std::ifstream& ifs)
+	{
+		ifs >> last_name >> first_name >> age;
+		return ifs;
 	}
 };
 
@@ -170,6 +177,15 @@ public:
 		ofs << attendance;
 		return ofs;
 	}
+	std::ifstream& scan(std::ifstream& ifs)
+	{
+		Human::scan(ifs);
+		char sz_speciality[SPECILITY_WIDTH + 1] = {};
+		ifs.read(sz_speciality, SPECILITY_WIDTH);
+		this->speciality = sz_speciality;
+		ifs >> group >> rating >> attendance;
+		return ifs;
+	}
 };
 
 class Teacher :public Human //добавил 3 отличия от Human, специальность, стаж работы, ставка
@@ -237,6 +253,15 @@ public:
 		ofs.width(RATE_WIDTH);
 		ofs << rate;
 		return ofs;
+	}
+	std::ifstream& scan(std::ifstream& ifs)
+	{
+		Human::scan(ifs);
+		char sz_speciality[PROFFESSION_WIDTH + 1] = {};
+		ifs.read(sz_speciality, PROFFESSION_WIDTH);
+		this->profession = sz_speciality;
+		ifs >> work_experience >> rate;
+		return ifs;
 	}
 };
 
@@ -334,10 +359,16 @@ public:
 		//ofs << GPA;
 		return ofs;
 	}
+	std::ifstream& scan(std::ifstream& ifs)
+	{
+		Student::scan(ifs);
+		std::getline(ifs, thesis);
+		return ifs;
+	}
 
 };
 //#define HOME_WORK
-
+//#define STORE_TO_FILE
 
 
 void main()
@@ -374,10 +405,11 @@ void main()
 #endif // HOME_WORK
 
 
+#ifdef STORE_TO_FILE
 	Human* group[] =
 	{
 		// UPCAST
-		new Human 
+		new Human
 		(
 			"Proba", "Probovich", 40
 		),
@@ -401,12 +433,12 @@ void main()
 	};
 	print(group, sizeof(group) / sizeof(group[0]));
 	save(group, sizeof(group) / sizeof(group[0]), "group.txt");
-	Human** group2 = new Human * [counter] {};
-	counter = 0;
-	group2 = load("group.txt");
-	cout << counter << endl;
-	print(group2, counter);
-	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+#endif // STORE_TO_FILE
+
+	int n;
+	Human** group = load("group.txt", n);
+	print(group, n);
+	for (int i = 0; i < n; i++)
 	{
 		delete group[i];
 	}
@@ -448,15 +480,96 @@ void save(Human** group, const int n, const string filename)
 	command += filename;
 	system(command.c_str());
 }
+Human* HumanFactory(const std::string& type)
+{
+	if (type.find("Teacher") != std::string::npos) return new Teacher("", "", 0, "", 0, 0);
+	if (type.find("Student") != std::string::npos) return new Student("", "", 0, "", "", 0, 0);
+	if (type.find("Gradute") != std::string::npos) return new Gradute("", "", 0, "", "", 0, 0, "");
+}
+Human** load(const std::string& filename, int& n)
+{
+	n = 0;
+	Human** group = nullptr;
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+		for(n = 0;!fin.eof(); n++)
+		{
+			std::string buffer;
+			std::getline(fin, buffer);
+		}
+		//2) Выделяем память под массив
+		group = new Human * [--n] {};
+		string line;
+		string word[10];
+		int count = 0;
+		fin.clear(); // - code of OA
+		fin.seekg(0); // - code of OA
+		//Создаем и читаем объекты
+		for (int i = 0; i < n; i++)
+		{
+			std::string type;
+			std::getline(fin, type, ':');
+			fin.ignore();
+			group[i] = HumanFactory(type);
+			fin >> *group[i];
+		}
+		//while (getline(fin, line))
+		//{
+		//	string temp_line = line;
 
-Human** load(const std::string& filename)
+		//	int position = 0;
+		//	position = temp_line.find(" ", 0);
+		//	temp_line = temp_line.substr(position + 1);
+		//	position = temp_line.find(" ", 0);
+		//	word[0] = temp_line.substr(0, position - 1);
+		//	temp_line = temp_line.substr(position + 2);
+		//	int size;
+		//	if (word[0] == "Human")size = 4;
+		//	if (word[0] == "Student")size = 9;
+		//	if (word[0] == "Teacher")size = 7;
+		//	if (word[0] == "Gradute")size = 10;
+		//	for (int i = 1; i < size; i++)
+		//	{
+		//		if (temp_line == "") break;
+		//		if (i == 8 && size == 10 )
+		//		{
+		//			word[8] = temp_line;
+		//			for (int k = 0; k < word[8].size(); k++) if (word[8][k] == ' ' && word[8][k + 1] != ' ')
+		//			{
+		//				word[8] = word[8].substr(k + 1);
+		//				break;
+		//			}
+		//			break;
+		//		}
+		//		position = temp_line.find(" ", 0);
+		//		word[i] = temp_line.substr(0, position);
+		//		temp_line = temp_line.substr(position + 1);
+		//		if (word[i] == " " or word[i] == "") i--;
+		//	}
+		//	if (word[0] == "Human")group[count] = new Human(word[1], word[2], stoi(word[3]));
+		//	if (word[0] == "Student")group[count] = new Student(word[1], word[2], stoi(word[3]), word[4], word[5], stoi(word[6]), stoi(word[7]));
+		//	if (word[0] == "Teacher")group[count] = new Teacher(word[1], word[2], stoi(word[3]), word[4], stoi(word[5]), stof(word[6]));
+		//	if (word[0] == "Gradute")group[count] = new Gradute(word[1], word[2], stoi(word[3]), word[4], word[5], stoi(word[6]), stoi(word[7]), word[8]);
+		//	count++;
+		//	//for (int i = 0; i < 10;i++)word[i].clear();
+		//}
+		fin.close();
+	}
+	else
+	{
+		std::cerr << "Error: file not found" << endl;
+	}
+	return group;
+}
+Human** loadmy(const std::string& filename)
 {
 	int n = 0;
 	Human** group = nullptr;
 	std::ifstream fin(filename);
 	if (fin.is_open())
 	{
-		for(n = 0;!fin.eof(); n++)
+		for (n = 0; !fin.eof(); n++)
 		{
 			std::string buffer;
 			std::getline(fin, buffer);
@@ -486,7 +599,7 @@ Human** load(const std::string& filename)
 			for (int i = 1; i < size; i++)
 			{
 				if (temp_line == "") break;
-				if (i == 8 && size == 10 )
+				if (i == 8 && size == 10)
 				{
 					word[8] = temp_line;
 					for (int k = 0; k < word[8].size(); k++) if (word[8][k] == ' ' && word[8][k + 1] != ' ')
@@ -515,4 +628,10 @@ Human** load(const std::string& filename)
 		std::cerr << "Error: file not found" << endl;
 	}
 	return group;
+}
+
+std::ifstream& operator>>(std::ifstream& ifs, Human& obj)
+{
+	obj.scan(ifs);
+	return ifs;
 }
