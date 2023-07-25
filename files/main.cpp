@@ -53,5 +53,52 @@ void main()
 		std::cerr << "Error: file not found" << endl;
 	}
 #endif // READ_FROM_FILE
+	//Создаем и открываем входящий поток
+	//Открываем сразу исходящий поток
+	std::ifstream fin("201 ready.txt");
+	std::ofstream fout_raw("201 RAW.txt");
+	std::ofstream fout_DHCPD("201 DHCPD");
+	if (fin.is_open())
+	{
+		const int MAC_SIZE = 18;
+		const int IP_SIZE = 16;
+		char* cz_mac_buffer = new char[MAC_SIZE] {};
+		char* cz_ip_buffer = new char[IP_SIZE] {};
+		while (!fin.eof())
+		{
+			fin >> cz_mac_buffer >> cz_ip_buffer;
+			if (strlen(cz_ip_buffer) == 0) continue;
+			fout_raw << cz_ip_buffer << "\t" << cz_mac_buffer << endl;
+			cout << cz_ip_buffer << "\t" << cz_mac_buffer << endl;
+		}
+		cout << endl << endl;
+		fin.clear();
+		fin.seekg(0);
+		for (int i = 0; !fin.eof(); i++)
+		{
+			fin >> cz_mac_buffer >> cz_ip_buffer;
+			if (strlen(cz_ip_buffer) == 0) continue;
+			fout_DHCPD << "host 201-" << i + 1 << endl;
+			fout_DHCPD << "{\n";
+			for (int j = 0; j < strlen(cz_mac_buffer); j++) if (cz_mac_buffer[j] == '-') cz_mac_buffer[j] = ':';
+			fout_DHCPD << "\t" << "hardware ethernet\t" << cz_mac_buffer << ";" << endl;
+			fout_DHCPD << "\tfixed-adress\t\t" << cz_ip_buffer << ";" << endl;
+			fout_DHCPD << "}\n";
 
+			cout << "host 201-" << i + 1 << endl;
+			cout << "{\n";
+			cout << "\t" << "hardware ethernet\t" << cz_mac_buffer << ";" << endl;
+			cout << "\tfixed-adress\t\t" << cz_ip_buffer << ";" << endl;
+			cout << "}\n";
+		}
+		fin.close();
+	}
+	else
+	{
+		cerr << "Error: File not open!" << endl;
+	}
+	fout_raw.close();
+	fout_DHCPD.close();
+	system("start notepad 201 RAW.txt");
+	system("start notepad 201 DHCPD");
 }
