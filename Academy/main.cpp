@@ -482,6 +482,7 @@ void save(Human** group, const int n, const string filename)
 }
 Human* HumanFactory(const std::string& type)
 {
+	if (type.find("Human") != std::string::npos) return new Human("", "", 0);
 	if (type.find("Teacher") != std::string::npos) return new Teacher("", "", 0, "", 0, 0);
 	if (type.find("Student") != std::string::npos) return new Student("", "", 0, "", "", 0, 0);
 	if (type.find("Gradute") != std::string::npos) return new Gradute("", "", 0, "", "", 0, 0, "");
@@ -502,7 +503,6 @@ Human** load(const std::string& filename, int& n)
 		group = new Human * [--n] {};
 		string line;
 		string word[10];
-		int count = 0;
 		fin.clear(); // - code of OA
 		fin.seekg(0); // - code of OA
 		//Создаем и читаем объекты
@@ -514,46 +514,6 @@ Human** load(const std::string& filename, int& n)
 			group[i] = HumanFactory(type);
 			fin >> *group[i];
 		}
-		//while (getline(fin, line))
-		//{
-		//	string temp_line = line;
-
-		//	int position = 0;
-		//	position = temp_line.find(" ", 0);
-		//	temp_line = temp_line.substr(position + 1);
-		//	position = temp_line.find(" ", 0);
-		//	word[0] = temp_line.substr(0, position - 1);
-		//	temp_line = temp_line.substr(position + 2);
-		//	int size;
-		//	if (word[0] == "Human")size = 4;
-		//	if (word[0] == "Student")size = 9;
-		//	if (word[0] == "Teacher")size = 7;
-		//	if (word[0] == "Gradute")size = 10;
-		//	for (int i = 1; i < size; i++)
-		//	{
-		//		if (temp_line == "") break;
-		//		if (i == 8 && size == 10 )
-		//		{
-		//			word[8] = temp_line;
-		//			for (int k = 0; k < word[8].size(); k++) if (word[8][k] == ' ' && word[8][k + 1] != ' ')
-		//			{
-		//				word[8] = word[8].substr(k + 1);
-		//				break;
-		//			}
-		//			break;
-		//		}
-		//		position = temp_line.find(" ", 0);
-		//		word[i] = temp_line.substr(0, position);
-		//		temp_line = temp_line.substr(position + 1);
-		//		if (word[i] == " " or word[i] == "") i--;
-		//	}
-		//	if (word[0] == "Human")group[count] = new Human(word[1], word[2], stoi(word[3]));
-		//	if (word[0] == "Student")group[count] = new Student(word[1], word[2], stoi(word[3]), word[4], word[5], stoi(word[6]), stoi(word[7]));
-		//	if (word[0] == "Teacher")group[count] = new Teacher(word[1], word[2], stoi(word[3]), word[4], stoi(word[5]), stof(word[6]));
-		//	if (word[0] == "Gradute")group[count] = new Gradute(word[1], word[2], stoi(word[3]), word[4], word[5], stoi(word[6]), stoi(word[7]), word[8]);
-		//	count++;
-		//	//for (int i = 0; i < 10;i++)word[i].clear();
-		//}
 		fin.close();
 	}
 	else
