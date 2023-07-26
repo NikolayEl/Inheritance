@@ -1,4 +1,4 @@
-#include<iostream>
+ï»¿#include<iostream>
 #include<Windows.h>
 using namespace std;
 
@@ -71,8 +71,8 @@ void main()
 {
 	setlocale(LC_ALL, "");
 	Square square(5, Color::console_red);
-	cout << "Äëèííà ñòîðîíû êâàäðàòà: " << square.get_side() << endl;
-	cout << "Ïëîùàäü êâàäðàòà: " << square.get_area() << endl;
-	cout << "Ïåðèìåòð êâàäðàòà: " << square.get_perimeter() << endl;
+	cout << "Ð”Ð»Ð¸Ð½Ð½Ð° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ñ‹ ÐºÐ²Ð°Ð´Ñ€Ð°Ñ‚Ð°: " << square.get_side() << endl;
+	cout << "ÐŸÐ»Ð¾Ñ‰Ð°Ð´ÑŒ ÐºÐ²Ð°Ð´Ñ€Ð°Ñ‚Ð°: " << square.get_area() << endl;
+	cout << "ÐŸÐµÑ€Ð¸Ð¼ÐµÑ‚Ñ€ ÐºÐ²Ð°Ð´Ñ€Ð°Ñ‚Ð°: " << square.get_perimeter() << endl;
 	square.draw();
 }
