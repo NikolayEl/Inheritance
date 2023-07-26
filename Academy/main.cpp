@@ -74,7 +74,16 @@ public:
 
 	virtual std::ostream& print(std::ostream& out) const
 	{
-		return out << last_name << " " << first_name << " " << age ;
+		out.width(LAST_NAME_WIDTH);
+		out << std::left;
+		out << last_name;
+		out.width(FIRST_NAME_WIDTH);
+		out << std::left;
+		out << first_name;
+		out.width(AGE_WIDTH);
+		out << std::left;
+		out << age;
+		return out;
 	}
 	virtual std::ofstream& print(std::ofstream& ofs) const
 	{
@@ -463,6 +472,7 @@ void print(Human** group, const int n)
 		//cout << *group[i] << endl;
 		//if(typeid(*group[i]) == typeid(Student)) //dynamic
 		//cout << *dynamic_cast<Student*>(group[i]) << endl;
+		if (group[i]) continue;
 		cout << *group[i] << endl;
 		cout << delimitr;
 
@@ -473,7 +483,7 @@ void save(Human** group, const int n, const string filename)
 	std::ofstream fout(filename);
 	for (int i = 0; i < n; i++)
 	{
-		fout << *group[i] << endl;
+		if(group[i])fout << *group[i] << endl;
 	}
 	fout.close();
 	std::string command = "start notepad ";
@@ -486,6 +496,8 @@ Human* HumanFactory(const std::string& type)
 	if (type.find("Teacher") != std::string::npos) return new Teacher("", "", 0, "", 0, 0);
 	if (type.find("Student") != std::string::npos) return new Student("", "", 0, "", "", 0, 0);
 	if (type.find("Gradute") != std::string::npos) return new Gradute("", "", 0, "", "", 0, 0, "");
+	//return new Human("", "", 0);
+	return nullptr;
 }
 Human** load(const std::string& filename, int& n)
 {
@@ -512,7 +524,7 @@ Human** load(const std::string& filename, int& n)
 			std::getline(fin, type, ':');
 			fin.ignore();
 			group[i] = HumanFactory(type);
-			fin >> *group[i];
+			if(group[i])fin >> *group[i];
 		}
 		fin.close();
 	}
