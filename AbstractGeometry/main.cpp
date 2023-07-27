@@ -1,5 +1,6 @@
 ﻿#include<iostream>
 #include<Windows.h>
+#include"math.h"
 //#include<cmath>
 using namespace std;
 
@@ -8,7 +9,7 @@ using namespace std;
 enum Color
 {
 	console_red = 0xCC, //0x - Hexadecimal 
-	console_green = 0x2,
+	console_green = 0xAA,
 	console_blue = 0x1,
 	console_defuult = 0x07
 };
@@ -186,11 +187,14 @@ public:
 			cout << endl;
 		}
 		SetConsoleTextAttribute(hConsole, Color::console_defuult);
+		system("PAUSE");
 	}
 };
 
 class Circle :public Shape
 {
+	static const int MIN_SIZE = 5;
+	static const int MAX_SIZE = 50;
 	const double pi = 3.1415926;
 	double radius;
 public:
@@ -204,6 +208,8 @@ public:
 	}
 	Circle(double radius, Color color) :Shape(color)
 	{
+		if (radius < MIN_SIZE) radius = MIN_SIZE;
+		if (radius > MAX_SIZE) radius = MAX_SIZE;
 		set_radius(radius);
 		cout << "CConstructor:\t" << this << endl;
 	}
@@ -221,13 +227,22 @@ public:
 	}
 	void draw() const override
 	{
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hConsole, color);
+		for (int i = 0; i < radius * 2; i++) cout << "\n";
+		cout << "Рисуем круг, нажмите на любую клавишу" << endl;
+		system("PAUSE");
+		HWND handle = FindWindowA("ConsoleWindowClass", NULL);
+		HDC hdc = GetDC(handle);
 
-
-
-		SetConsoleTextAttribute(hConsole, Color::console_defuult);
+		//создаём перо (контур)
+		HPEN hPen = CreatePen(PS_SOLID, 10, color); //сплошная линия, толщиной 10 пикселей, цвет - зеленый
+		//создаём кисть (заливка)
+		HBRUSH hBrush = CreateSolidBrush(0x0);//сплошной черный
+		SelectObject(hdc, hPen);// указываем перо 
+		SelectObject(hdc, hBrush);//указываем кисть
+		//рисуем эллипс
+		Ellipse(hdc, 500, 20, radius * 10 * 2 + 500, radius * 10 * 2 + 20); //100,100 -верхний левый 200,300 - нижний правый углы описывающего прямоугольника
 	}
+		
 };
 
 void main()
@@ -263,11 +278,11 @@ void main()
 	cout << delimitr << endl;
 
 	//					Круг
-	Circle circle(11, Color::console_green);
+	Circle circle(15, Color::console_green);
 	cout << delimitr << endl;
 	cout << "Длинна окружности круга: " << circle.get_perimeter() << endl;
 	cout << "радиус: " << circle.get_radius() << endl;
 	cout << "Площадь круга: " << circle.get_area() << endl;
-	//circle.draw();
+	circle.draw();
 	cout << delimitr << endl;
 }
