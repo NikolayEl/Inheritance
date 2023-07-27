@@ -1,12 +1,15 @@
 ﻿#include<iostream>
 #include<Windows.h>
+//#include<cmath>
 using namespace std;
+
+#define delimitr "\n----------------------------------------------------------\n"
 
 enum Color
 {
 	console_red = 0xCC, //0x - Hexadecimal 
-	console_green = 0xAA,
-	console_blue = 0x99,
+	console_green = 0x2,
+	console_blue = 0x1,
 	console_defuult = 0x07
 };
 
@@ -22,41 +25,60 @@ public:
 	virtual void draw()const = 0;
 };
 
-class Square :public Shape
+class Rectangles :public Shape
 {
 	static const int MIN_SIDE = 2;
 	static const int MAX_SIDE = 50;
-	double side;
+	double long_side;
+	double width_side;
 public:
-	Square(double side, Color color) :Shape(color)
+	Rectangles(double long_side, double width_side, Color color) :Shape(color)
 	{
-		set_side(side);
+		set_long_side(long_side);
+		set_width_side(width_side);
+		cout << "RectangleConstructor:\t" << this << endl;
 	}
-	double get_side() const
+	Rectangles(double side, Color color) :Shape(color)
 	{
-		return side;
+		set_long_side(side);
+		set_width_side(side);
+		cout << "SquareConstructor:\t" << this << endl;
 	}
-	void set_side(double side)
+	double get_long_side() const
 	{
-		if (side < MIN_SIDE) side = MIN_SIDE;
-		if (side > MAX_SIDE) side = MAX_SIDE;
-		this->side = side;
+		return long_side;
+	}
+	double get_width_side() const
+	{
+		return width_side;
+	}
+	void set_long_side(double long_side)
+	{
+		if (long_side < MIN_SIDE) long_side = MIN_SIDE;
+		if (long_side > MAX_SIDE) long_side = MAX_SIDE;
+		this->long_side = long_side;
+	}
+	void set_width_side(double width_side)
+	{
+		if (width_side < MIN_SIDE) width_side = MIN_SIDE;
+		if (width_side > MAX_SIDE) width_side = MAX_SIDE;
+		this->width_side = width_side;
 	}
 	double get_area() const override
 	{
-		return side * side;
+		return long_side * width_side;
 	}
 	double get_perimeter() const override
 	{
-		return side * 4;
+		return (long_side + width_side) * 2;
 	}
 	void draw() const override
 	{
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		SetConsoleTextAttribute(hConsole, color);
-		for (int i = 0; i < side; i++)
+		for (int i = 0; i < width_side; i++)
 		{
-			for (int j = 0; j < side; j++)
+			for (int j = 0; j < long_side; j++)
 			{
 				cout << "* ";
 			}
@@ -64,15 +86,188 @@ public:
 		}
 		SetConsoleTextAttribute(hConsole, Color::console_defuult);
 	}
+	~Rectangles()
+	{
+		cout << "RDestructor:\t" << this << endl;
+	}
 
+};
+
+class Triangle :public Shape
+{
+	static const int MIN_SIDE = 2;
+	static const int MAX_SIDE = 50;
+	double side_one;
+	double side_two;
+	double side_three;
+	double height;
+public:
+	double get_side_one() const
+	{
+		return side_one;
+	}
+	double get_side_two() const
+	{
+		return side_two;
+	}
+	double get_side_three() const
+	{
+		return side_three;
+	}
+	double get_height() const
+	{
+		return (2 * this->get_area()) / max((side_one, side_two), side_three);
+	}
+	void set_side_one(double side_one)
+	{
+		this->side_one = side_one;
+	}
+	void set_side_two(double side_two)
+	{
+		this->side_two = side_two;
+	}
+	void set_side_three(double side_three)
+	{
+		this->side_three = side_three;
+	}
+	Triangle(double side_one, double side_two, double side_three, Color color) :Shape(color)
+	{
+		set_side_one(side_one);
+		set_side_two(side_two);
+		set_side_three(side_three);
+		cout << "TConstructor:\t" << this << endl;
+	}
+	Triangle(double side, Color color) :Shape(color)
+	{
+		set_side_one(side);
+		set_side_two(side);
+		set_side_three(side);
+		cout << "IsoscelesTConstructor:\t" << this << endl;
+	}
+	~Triangle()
+	{
+		cout << "TDestructor:\t" << this << endl;
+	}
+	double get_area() const override
+	{
+		double pperimetr = this->get_perimeter() / 2;
+		return round(sqrt(pperimetr * (pperimetr - side_one) * (pperimetr - side_two) * (pperimetr - side_three))*10)/10;
+	}
+	double get_perimeter() const override
+	{
+		return side_one + side_two + side_three;
+	}
+	void draw() const override
+	{
+		double base_side = max((side_one, side_two), side_three);
+		double one_side = min((side_one, side_two), side_three);
+		double two_side = this->get_perimeter() - base_side - one_side;
+		double a_cattle = round(sqrt((one_side * one_side) - (this->get_height() * this->get_height()))*10)/10;
+		double b_cattle = base_side - a_cattle;
+		//cout << base_side << " " << one_side << " " << two_side << " " << a_cattle << " " << b_cattle << " " << this->get_height() << endl;
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, color);
+		for (int i = 0; i < a_cattle - 1; i++)
+		{
+			for (int j = 0; j < i + 1; j++)
+			{
+				cout << "* ";
+			}
+			cout << endl;
+		}
+		for (int i = 0; i < a_cattle; i++) cout << "* ";
+		cout << endl;
+		for (int i = b_cattle - 1; i > -1; i--)
+		{
+			for (int j = i + 1; j > 0; j--)
+			{
+				cout << "* ";
+			}
+			cout << endl;
+		}
+		SetConsoleTextAttribute(hConsole, Color::console_defuult);
+	}
+};
+
+class Circle :public Shape
+{
+	const double pi = 3.1415926;
+	double radius;
+public:
+	double get_radius() const
+	{
+		return radius;
+	}
+	void set_radius(double radius)
+	{
+		this->radius = radius;
+	}
+	Circle(double radius, Color color) :Shape(color)
+	{
+		set_radius(radius);
+		cout << "CConstructor:\t" << this << endl;
+	}
+	~Circle()
+	{
+		cout << "CDestructor:\t" << this << endl;
+	}
+	double get_area() const override
+	{
+		return round(pi * radius * radius *10)/10;
+	}
+	double get_perimeter() const override
+	{
+		return round(2 * pi * radius *10)/10;
+	}
+	void draw() const override
+	{
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, color);
+
+
+
+		SetConsoleTextAttribute(hConsole, Color::console_defuult);
+	}
 };
 
 void main()
 {
 	setlocale(LC_ALL, "");
-	Square square(5, Color::console_red);
-	cout << "Длинна стороны квадрата: " << square.get_side() << endl;
+	//					ПРЯМОУГОЛЬНИК
+	Rectangles rect(10, 5, Color::console_red);
+	cout << delimitr << endl;
+	cout << "Длинна прямоугольника: " << rect.get_long_side() << endl;
+	cout << "Ширина прямоугольника: " << rect.get_width_side() << endl;
+	cout << "Площадь прямоугольника: " << rect.get_area() << endl;
+	cout << "Периметр прямоугольника: " << rect.get_perimeter() << endl;
+	rect.draw();
+	cout << delimitr << endl;
+
+	//					Квадрат
+	Rectangles square(5, Color::console_red);
+	cout << delimitr << endl;
+	cout << "Длинна стороны квадрата: " << square.get_long_side() << endl;
 	cout << "Площадь квадрата: " << square.get_area() << endl;
 	cout << "Периметр квадрата: " << square.get_perimeter() << endl;
 	square.draw();
+	cout << delimitr << endl;
+
+	//					Треугольник
+	Triangle triangle(11, Color::console_blue);
+	cout << delimitr << endl;
+	cout << "Длинна равностороннего треугольника: " << triangle.get_side_one() << endl;
+	cout << "Площадь равностороннего треугольника: " << triangle.get_area() << endl;
+	cout << "Периметр равностороннего треугольника: " << triangle.get_perimeter() << endl;
+	cout << "Высота равностороннего треугольника: " << triangle.get_height() << endl;
+	triangle.draw();
+	cout << delimitr << endl;
+
+	//					Круг
+	Circle circle(11, Color::console_green);
+	cout << delimitr << endl;
+	cout << "Длинна окружности круга: " << circle.get_perimeter() << endl;
+	cout << "радиус: " << circle.get_radius() << endl;
+	cout << "Площадь круга: " << circle.get_area() << endl;
+	//circle.draw();
+	cout << delimitr << endl;
 }

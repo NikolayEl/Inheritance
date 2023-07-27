@@ -26,14 +26,14 @@ public:
 	}
 
 	//				Constructor
-	Definition(const std::string& name, const std::string& definit):name(name), definit(definit)
+	Definition(const std::string& name, const std::string& definit) :name(name), definit(definit)
 	{
 		cout << "Constructor:\t" << this << endl;
 	}
 	~Definition()
 	{
 		cout << "Destructor:\t" << this << endl;
- 	}
+	}
 
 	//				Method's
 	void print() const
