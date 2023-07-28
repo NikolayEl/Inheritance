@@ -191,43 +191,63 @@ public:
 	}
 };
 
-class Circle :public Shape
+class Ellipses :public Shape
 {
 	static const int MIN_SIZE = 5;
 	static const int MAX_SIZE = 50;
 	const double pi = 3.1415926;
-	double radius;
+	double semiaxis_a;
+	double semiaxis_b;
 public:
-	double get_radius() const
+	double get_semiaxis_a() const
 	{
-		return radius;
+		return semiaxis_a;
 	}
-	void set_radius(double radius)
+	double get_semiaxis_b() const
 	{
-		this->radius = radius;
+		return semiaxis_b;
 	}
-	Circle(double radius, Color color) :Shape(color)
+	void set_semiaxis_a(double semiaxis_a)
+	{
+		this->semiaxis_a = semiaxis_a;
+	}
+	void set_semiaxis_b(double semiaxis_b)
+	{
+		this->semiaxis_b = semiaxis_b;
+	}
+	Ellipses(double semiaxis_a, double semiaxis_b, Color color) :Shape(color)
+	{
+		if (semiaxis_a < MIN_SIZE) semiaxis_a = MIN_SIZE;
+		if (semiaxis_a > MAX_SIZE) semiaxis_a = MAX_SIZE;
+		if (semiaxis_b < MIN_SIZE) semiaxis_b = MIN_SIZE;
+		if (semiaxis_b > MAX_SIZE) semiaxis_b = MAX_SIZE;
+		set_semiaxis_a(semiaxis_a);
+		set_semiaxis_b(semiaxis_b);
+		cout << "EConstructor:\t" << this << endl;
+	}
+	Ellipses(double radius, Color color) :Shape(color)
 	{
 		if (radius < MIN_SIZE) radius = MIN_SIZE;
 		if (radius > MAX_SIZE) radius = MAX_SIZE;
-		set_radius(radius);
-		cout << "CConstructor:\t" << this << endl;
+		set_semiaxis_a(radius);
+		set_semiaxis_b(radius);
+		cout << "CircleConstructor:\t" << this << endl;
 	}
-	~Circle()
+	~Ellipses()
 	{
-		cout << "CDestructor:\t" << this << endl;
+		cout << "EDestructor:\t" << this << endl;
 	}
 	double get_area() const override
 	{
-		return round(pi * radius * radius *10)/10;
+		return round(pi * semiaxis_a * semiaxis_b *10)/10;
 	}
 	double get_perimeter() const override
 	{
-		return round(2 * pi * radius *10)/10;
+		return round(2 * pi * sqrt((semiaxis_a * semiaxis_a + semiaxis_b * semiaxis_b) / 2) *10)/10;
 	}
 	void draw() const override
 	{
-		for (int i = 0; i < radius * 2; i++) cout << "\n";
+		for (int i = 0; i < semiaxis_a * 2; i++) cout << "\n";
 		cout << "Рисуем круг, нажмите на любую клавишу" << endl;
 		system("PAUSE");
 		HWND handle = FindWindowA("ConsoleWindowClass", NULL);
@@ -240,7 +260,8 @@ public:
 		SelectObject(hdc, hPen);// указываем перо 
 		SelectObject(hdc, hBrush);//указываем кисть
 		//рисуем эллипс
-		Ellipse(hdc, 500, 20, radius * 10 * 2 + 500, radius * 10 * 2 + 20); //100,100 -верхний левый 200,300 - нижний правый углы описывающего прямоугольника
+		Ellipse(hdc, 500, 20, semiaxis_a * 10 * 2 + 500, semiaxis_b * 10 * 2 + 20); 
+		//500,20 -верхний левый semiaxis_a * 10 * 2 + 500, semiaxis_b * 10 * 2 + 20 - нижний правый углы описывающего прямоугольника
 	}
 		
 };
@@ -278,10 +299,11 @@ void main()
 	cout << delimitr << endl;
 
 	//					Круг
-	Circle circle(15, Color::console_green);
+	Ellipses circle(10, 5, Color::console_green);
 	cout << delimitr << endl;
-	cout << "Длинна окружности круга: " << circle.get_perimeter() << endl;
-	cout << "радиус: " << circle.get_radius() << endl;
+	cout << "Длинна окружности элипса: " << circle.get_perimeter() << endl;
+	cout << "радиус a: " << circle.get_semiaxis_a() << endl;
+	cout << "радиус b: " << circle.get_semiaxis_b() << endl;
 	cout << "Площадь круга: " << circle.get_area() << endl;
 	circle.draw();
 	cout << delimitr << endl;
