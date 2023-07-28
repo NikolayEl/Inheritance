@@ -20,13 +20,60 @@ namespace Geometry
 		console_defuult = 0x07
 	};
 
+#define SHAPE_TAKE_PARAMETERS	int start_x, int start_y, int line_width, Color color
+#define SHAPE_GIVE_PARAMETERS	start_x, start_y, line_width, color
+
 	class Shape
 	{
+		static const int MIN_START_X = 10;
+		static const int MIN_LINE_WIDTH = 10;		
+		static const int MAX_START_X = 500;
+		static const int MAX_LINE_WIDTH = 400;
+
 	protected:
+		int start_x;
+		int start_y;
+		int line_width;
 		Color color;
 	public:
-		Shape(Color color) :color(color) {}
+		Shape(int start_x, int start_y, int line_width, Color color) :color(color) 
+		{
+			set_start_x(start_x);
+			set_start_y(start_y);
+			set_line_width(line_width);
+		}
 		virtual ~Shape() {}
+		int get_start_x() const
+		{
+			return start_x;
+		}
+		int get_start_y() const
+		{
+			return start_y;
+		}
+		int get_line_width() const
+		{
+			return line_width;
+		}
+		void set_start_x(int start_x)
+		{
+			if (start_x < MIN_START_X) start_x = MIN_START_X;
+			if (start_x < MAX_START_X) start_x = MAX_START_X;
+			this->start_x = start_x;
+		}
+		void set_start_y(int start_y)
+		{
+			if (start_y < MIN_LINE_WIDTH) start_y = MIN_LINE_WIDTH;
+			if (start_y < MAX_LINE_WIDTH) start_y = MAX_LINE_WIDTH;
+			this->start_y = start_y;
+		}
+		void set_line_width(int line_width)
+		{
+			if (line_width < MIN_LINE_WIDTH) line_width = MIN_LINE_WIDTH;
+			if (line_width < MAX_LINE_WIDTH) line_width = MAX_LINE_WIDTH;
+			this->line_width = line_width;
+		}
+
 		virtual double get_area()const = 0;
 		virtual double get_perimeter() const = 0;
 		virtual void draw()const = 0;
@@ -45,17 +92,11 @@ namespace Geometry
 		double long_side;
 		double width_side;
 	public:
-		Rectangle(double long_side, double width_side, Color color) :Shape(color)
+		Rectangle(double long_side, double width_side, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
 			set_long_side(long_side);
 			set_width_side(width_side);
 			//cout << "RectangleConstructor:\t" << this << endl;
-		}
-		Rectangle(double side, Color color) :Shape(color)
-		{
-			set_long_side(side);
-			set_width_side(side);
-			//cout << "SquareConstructor:\t" << this << endl;
 		}
 		double get_long_side() const
 		{
@@ -88,9 +129,14 @@ namespace Geometry
 		void draw() const override
 		{
 			//1) Получаем окно консоли
-			HWND hwnd = GetConsoleWindow(); //Получаем окно консоли
+			HWND hwnd = GetConsoleWindow(); //Получаем окно консоли (Функция GetConsoleWindow() возвращает hwnd окна консоли из текущего потока команд)
+			//HWND - Hangler to Window (Обработчик окна)
+			// К переменной можно обратится по имени, к окну можно обратится через hwnd
 			//2) СОздаем контекст устройства
 			HDC hdc = GetDC(hwnd); // СОздаем контекст устройства
+			// контекст устройства есть у каждого окна
+			// Рисовать можно только на контексте устройства
+			// Функция GetDC(hwnd) возращает контекст устройства заданного окна
 			//3) Создаем кисть и карандаш
 			HPEN hPen = CreatePen(PS_SOLID, 5, color); //карандаш рисует контур фигуры
 			HBRUSH hBrush = CreateSolidBrush(color); //Кисть заливает цыетом фигуру
@@ -100,7 +146,7 @@ namespace Geometry
 			SelectObject(hdc, hBrush);
 
 			//5) Рисуем фигуру
-			::Rectangle(hdc, 100, 200, 100 + (long_side * 50), 200 + (width_side * 50));
+			::Rectangle(hdc, start_x, start_y, start_x + long_side, start_y + width_side);
 
 			DeleteObject(hPen);
 			DeleteObject(hBrush);
@@ -121,11 +167,17 @@ namespace Geometry
 		{
 			cout << typeid(*this).name() << endl;
 			cout << "Длинна стороны a: " << get_long_side() << endl;
-			cout << "Длинна стороны b: " << get_width_side() << endl;
+			if(long_side != width_side)cout << "Длинна стороны b: " << get_width_side() << endl;
 			Shape::info();
 		}
 		~Rectangle() {}
 
+	};
+	class Square :public Rectangle
+	{
+	public:
+		Square(double side, SHAPE_TAKE_PARAMETERS) :Rectangle(side, side, SHAPE_GIVE_PARAMETERS){}
+		~Square() {}
 	};
 
 	class Triangle :public Shape
@@ -165,14 +217,14 @@ namespace Geometry
 		{
 			this->side_three = side_three;
 		}
-		Triangle(double side_one, double side_two, double side_three, Color color) :Shape(color)
+		Triangle(double side_one, double side_two, double side_three, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
 			set_side_one(side_one);
 			set_side_two(side_two);
 			set_side_three(side_three);
 			//cout << "TConstructor:\t" << this << endl;
 		}
-		Triangle(double side, Color color) :Shape(color)
+		Triangle(double side, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
 			set_side_one(side);
 			set_side_two(side);
@@ -223,6 +275,14 @@ namespace Geometry
 			SetConsoleTextAttribute(hConsole, Color::console_defuult);
 			//system("PAUSE");
 		}
+		void info() const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Длинна стороны a: " << get_side_one() << endl;
+			if(side_one != side_two)cout << "Длинна стороны b: " << get_side_two() << endl;
+			if (side_two != side_three)cout << "Длинна стороны c: " << get_side_three() << endl;
+			Shape::info();
+		}
 	};
 
 	class Ellipses :public Shape
@@ -249,7 +309,7 @@ namespace Geometry
 		{
 			this->semiaxis_b = semiaxis_b;
 		}
-		Ellipses(double semiaxis_a, double semiaxis_b, Color color) :Shape(color)
+		Ellipses(double semiaxis_a, double semiaxis_b, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
 			if (semiaxis_a < MIN_SIZE) semiaxis_a = MIN_SIZE;
 			if (semiaxis_a > MAX_SIZE) semiaxis_a = MAX_SIZE;
@@ -259,7 +319,7 @@ namespace Geometry
 			set_semiaxis_b(semiaxis_b);
 			//cout << "EConstructor:\t" << this << endl;
 		}
-		Ellipses(double radius, Color color) :Shape(color)
+		Ellipses(double radius, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
 			if (radius < MIN_SIZE) radius = MIN_SIZE;
 			if (radius > MAX_SIZE) radius = MAX_SIZE;
@@ -296,6 +356,13 @@ namespace Geometry
 			Ellipse(hdc, 500, 20, semiaxis_a * 10 * 2 + 500, semiaxis_b * 10 * 2 + 20);
 			//500,20 -верхний левый semiaxis_a * 10 * 2 + 500, semiaxis_b * 10 * 2 + 20 - нижний правый углы описывающего прямоугольника
 		}
+		void info() const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << "Радиус а: " << get_semiaxis_a() << endl;
+			if(semiaxis_a != semiaxis_b)cout << "Радиус b: " << get_semiaxis_a() << endl;
+			Shape::info();
+		}
 
 	};
 }
@@ -309,7 +376,7 @@ void main()
 	setlocale(LC_ALL, "");
 #ifdef RECTANGLE_MAIN
 	//					ПРЯМОУГОЛЬНИК
-	Geometry::Rectangle rect(10, 5, Geometry::Color::blue);
+	Geometry::Rectangle rect(100, 100, 5, 500, 200, Geometry::Color::blue);
 	cout << delimitr << endl;
 	system("PAUSE");
 	rect.info();
@@ -319,7 +386,7 @@ void main()
 #ifdef SQUARE_MAIN
 	//					Квадрат
 	cout << delimitr << endl;
-	Geometry::Rectangle square(5, Geometry::Color::red);
+	Geometry::Square square(300, 100, 100, 150, Geometry::Color::red);
 	cout << delimitr << endl;
 	system("PAUSE");
 	square.info();
