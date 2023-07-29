@@ -240,12 +240,11 @@ namespace Geometry
 			set_side_three(three_side);
 			//cout << "TConstructor:\t" << this << endl;
 		}
-		Triangle(double side, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
+		Triangle(double katet_a, double katet_b, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
-			set_side_one(side);
-			set_side_two(side);
-			set_side_three(side);
-			//cout << "IsoscelesTConstructor:\t" << this << endl;
+			set_side_two(katet_a);
+			set_side_three(katet_b);
+			set_side_one(round(sqrt((katet_a * katet_a) + (katet_b * katet_b)) * 10) / 10);
 		}
 		~Triangle()
 		{
@@ -292,10 +291,32 @@ namespace Geometry
 		{
 			cout << typeid(*this).name() << endl;
 			cout << (side_one != side_two&& side_one != side_three? "Длинна стороны a:" : "Длинна стороны равностороннего треугольника: ") << get_side_one() << endl;
-			if(side_one != side_two)cout << "Длинна стороны b: " << get_side_two() << endl;
+			if(side_one != side_two)cout << (side_two == side_three? "Длинна равнобедренной стороны: ":"Длинна стороны b: ") << get_side_two() << endl;
 			if (side_two != side_three)cout << "Длинна стороны c: " << get_side_three() << endl;
 			Shape::info();
 		}
+	};
+	class Triangle_Equilateral :public Triangle
+	{
+	public:
+		Triangle_Equilateral(double side, SHAPE_TAKE_PARAMETERS):Triangle(side, side, side, SHAPE_GIVE_PARAMETERS){}
+		~Triangle_Equilateral() {}
+	};
+	class Triangle_Isosceles :public Triangle
+	{
+	public:
+		Triangle_Isosceles(double side_isos, double base_side, SHAPE_TAKE_PARAMETERS):Triangle(side_isos, side_isos, base_side, SHAPE_GIVE_PARAMETERS) {}
+		~Triangle_Isosceles() {}
+	};
+	class Triangle_Right :public Triangle
+	{
+	public:
+		double get_hypotenuse() const
+		{
+			return round((sqrt(get_side_one() * get_side_one() + get_side_two() * get_side_two()))*10)/10;
+		}
+		Triangle_Right(double katet_a, double katet_b, SHAPE_TAKE_PARAMETERS):Triangle(katet_a, katet_b, SHAPE_GIVE_PARAMETERS) {}
+		~Triangle_Right() {}
 	};
 
 	class Ellipse :public Shape
@@ -383,7 +404,10 @@ namespace Geometry
 //#define SQUARE_MAIN
 //#define TRIANGLE_MAIN
 //#define ELLIPS_MAIN
-#define CIRCLE_MAIN
+//#define CIRCLE_MAIN
+//#define TRIANGLE_EQUILATERAL
+//#define TRIANGLE_ISOSCELES
+
 void main()
 {
 	setlocale(LC_ALL, "");
@@ -410,7 +434,7 @@ void main()
 
 #ifdef ELLIPS_MAIN
 	//					Элипс
-	Geometry::Ellipse ellipse(200, 100, 150, 150, 5, Geometry::Color::green);
+	Geometry::Ellipse ellipse(200, 100, 150, 250, 5, Geometry::Color::green);
 	ellipse.info();
 #endif // ELLIPS_MAIN
 	
@@ -420,5 +444,22 @@ void main()
 	circle.info();
 
 #endif // CIRCLE_MAIN
+
+#ifdef TRIANGLE_EQUILATERAL
+	//					Равносторонний треугольник
+	Geometry::Triangle_Equilateral triangle_eq(200, 600, 150, 5, Geometry::Color::red);
+	triangle_eq.info();
+
+#endif // TRIANGLE_EQUILATERAL
+
+#ifdef TRIANGLE_ISOSCELES
+	//					Равнобедренный треугольник
+	Geometry::Triangle_Isosceles triangle_is(200, 300, 600, 150, 5, Geometry::Color::yellow);
+	triangle_is.info();
+#endif // TRIANGLE_ISOSCELES
+
+	//					Прямоугольный треугольник по 2 катетам
+	Geometry::Triangle_Right triangle_right(100, 150, 600, 150, 5, Geometry::Color::yellow);
+	triangle_right.info();
 
 }
