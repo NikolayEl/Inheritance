@@ -277,7 +277,7 @@ namespace Geometry
 			// Рисовать можно только на контексте устройства
 			// Функция GetDC(hwnd) возращает контекст устройства заданного окна
 			//3) Создаем кисть и карандаш
-			HPEN hPen = CreatePen(PS_SOLID, 5, color); //карандаш рисует контур фигуры
+			HPEN hPen = CreatePen(PS_SOLID, get_line_width(), color); //карандаш рисует контур фигуры
 			HBRUSH hBrush = CreateSolidBrush(color); //Кисть заливает цветом фигуру
 
 			//4) Выбираем чем и на чем будем рисовать
@@ -285,7 +285,7 @@ namespace Geometry
 			SelectObject(hdc, hBrush);
 
 			//5) Рисуем фигуру
-			::Rectangle(hdc, start_x, start_y, start_x + long_side, start_y + width_side);
+			::Rectangle(hdc, get_start_x(), get_start_y(), get_start_x() + get_long_side(), get_start_y() + get_width_side());
 
 			DeleteObject(hPen);
 			DeleteObject(hBrush);
