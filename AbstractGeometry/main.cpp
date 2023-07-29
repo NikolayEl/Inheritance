@@ -1,4 +1,5 @@
-﻿#include<iostream>
+﻿#define _USE_MATH_DEFINES
+#include<iostream>
 #include<Windows.h>
 #include"math.h"
 //#include<cmath>
@@ -26,8 +27,10 @@ namespace Geometry
 	class Shape
 	{
 		static const int MIN_START_X = 10;
-		static const int MIN_LINE_WIDTH = 10;		
+		static const int MIN_START_Y = 10;
 		static const int MAX_START_X = 500;
+		static const int MAX_START_Y = 600;
+		static const int MIN_LINE_WIDTH = 10;		
 		static const int MAX_LINE_WIDTH = 400;
 
 	protected:
@@ -58,19 +61,19 @@ namespace Geometry
 		void set_start_x(int start_x)
 		{
 			if (start_x < MIN_START_X) start_x = MIN_START_X;
-			if (start_x < MAX_START_X) start_x = MAX_START_X;
+			if (start_x > MAX_START_X) start_x = MAX_START_X;
 			this->start_x = start_x;
 		}
 		void set_start_y(int start_y)
 		{
-			if (start_y < MIN_LINE_WIDTH) start_y = MIN_LINE_WIDTH;
-			if (start_y < MAX_LINE_WIDTH) start_y = MAX_LINE_WIDTH;
+			if (start_y < MIN_START_Y) start_y = MIN_START_Y;
+			if (start_y > MAX_START_Y) start_y = MAX_START_Y;
 			this->start_y = start_y;
 		}
 		void set_line_width(int line_width)
 		{
 			if (line_width < MIN_LINE_WIDTH) line_width = MIN_LINE_WIDTH;
-			if (line_width < MAX_LINE_WIDTH) line_width = MAX_LINE_WIDTH;
+			if (line_width > MAX_LINE_WIDTH) line_width = MAX_LINE_WIDTH;
 			this->line_width = line_width;
 		}
 
@@ -87,8 +90,8 @@ namespace Geometry
 
 	class Rectangle :public Shape
 	{
-		static const int MIN_SIDE = 2;
-		static const int MAX_SIDE = 50;
+		static const int MIN_SIDE = 20;
+		static const int MAX_SIDE = 500;
 		double long_side;
 		double width_side;
 	public:
@@ -139,7 +142,7 @@ namespace Geometry
 			// Функция GetDC(hwnd) возращает контекст устройства заданного окна
 			//3) Создаем кисть и карандаш
 			HPEN hPen = CreatePen(PS_SOLID, 5, color); //карандаш рисует контур фигуры
-			HBRUSH hBrush = CreateSolidBrush(color); //Кисть заливает цыетом фигуру
+			HBRUSH hBrush = CreateSolidBrush(color); //Кисть заливает цветом фигуру
 
 			//4) Выбираем чем и на чем будем рисовать
 			SelectObject(hdc, hPen);
@@ -166,7 +169,7 @@ namespace Geometry
 		void info() const override
 		{
 			cout << typeid(*this).name() << endl;
-			cout << "Длинна стороны a: " << get_long_side() << endl;
+			cout << (long_side != width_side? "Длинна стороны a: ": "Длинна стороны квадрата: ") << get_long_side() << endl;
 			if(long_side != width_side)cout << "Длинна стороны b: " << get_width_side() << endl;
 			Shape::info();
 		}
@@ -182,8 +185,8 @@ namespace Geometry
 
 	class Triangle :public Shape
 	{
-		static const int MIN_SIDE = 2;
-		static const int MAX_SIDE = 50;
+		static const int MIN_SIDE = 20;
+		static const int MAX_SIDE = 500;
 		double side_one;
 		double side_two;
 		double side_three;
@@ -203,25 +206,36 @@ namespace Geometry
 		}
 		double get_height() const
 		{
-			return (2 * this->get_area()) / max((side_one, side_two), side_three);
+			return (2 * this->get_area()) / max(max(side_one, side_two), side_three);
 		}
 		void set_side_one(double side_one)
 		{
+			if (side_one < MIN_SIDE) side_one = MIN_SIDE;
+			if (side_one > MAX_SIDE) side_one = MAX_SIDE;
 			this->side_one = side_one;
 		}
 		void set_side_two(double side_two)
 		{
+			if (side_two < MIN_SIDE) side_two = MIN_SIDE;
+			if (side_two > MAX_SIDE) side_two = MAX_SIDE;
 			this->side_two = side_two;
 		}
 		void set_side_three(double side_three)
 		{
+			if (side_three < MIN_SIDE) side_three = MIN_SIDE;
+			if (side_three > MAX_SIDE) side_three = MAX_SIDE;
 			this->side_three = side_three;
 		}
 		Triangle(double side_one, double side_two, double side_three, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
-			set_side_one(side_one);
-			set_side_two(side_two);
-			set_side_three(side_three);
+			double max_side = max(max(side_one, side_two), side_three);
+			double min_side = min(min(side_one, side_two), side_three);
+			double three_side = (side_one + side_two + side_three) - (max_side + min_side);
+			if (max_side >= (min_side + three_side)) max_side = (min_side + three_side) - 10;
+			// В трегольника невозможно чтобы большая сторона была больше или равнялась сумме остальных двух сторон
+			set_side_one(max_side);
+			set_side_two(min_side);
+			set_side_three(three_side);
 			//cout << "TConstructor:\t" << this << endl;
 		}
 		Triangle(double side, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
@@ -246,50 +260,50 @@ namespace Geometry
 		}
 		void draw() const override
 		{
-			double base_side = max((side_one, side_two), side_three);
-			double one_side = min((side_one, side_two), side_three);
-			double two_side = this->get_perimeter() - base_side - one_side;
-			double a_cattle = round(sqrt((one_side * one_side) - (this->get_height() * this->get_height())) * 10) / 10;
+			double base_side = max(max(side_one, side_two), side_three);
+			double one_side = min(min(side_one, side_two), side_three);
+			double two_side = get_perimeter() - base_side - one_side;
+			double a_cattle = round(sqrt((one_side * one_side) - (get_height() * get_height())) * 10) / 10;
 			double b_cattle = base_side - a_cattle;
 			//cout << base_side << " " << one_side << " " << two_side << " " << a_cattle << " " << b_cattle << " " << this->get_height() << endl;
-			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleTextAttribute(hConsole, color);
-			for (int i = 0; i < a_cattle - 1; i++)
-			{
-				for (int j = 0; j < i + 1; j++)
-				{
-					cout << "* ";
-				}
-				cout << endl;
-			}
-			for (int i = 0; i < a_cattle; i++) cout << "* ";
-			cout << endl;
-			for (int i = b_cattle - 1; i > -1; i--)
-			{
-				for (int j = i + 1; j > 0; j--)
-				{
-					cout << "* ";
-				}
-				cout << endl;
-			}
-			SetConsoleTextAttribute(hConsole, Color::console_defuult);
-			//system("PAUSE");
+			
+			// Получаем окно консоли
+			HWND hwnd = GetConsoleWindow();
+			//2) Создаем контекст устройства
+			HDC hdc = GetDC(hwnd);
+			//3) Создаем кисть и карандаш
+			HPEN hPen = CreatePen(PS_SOLID, get_line_width(), color);
+			//4) Кисть заливает цветом фигуру
+			HBRUSH hBrush = CreateSolidBrush(color);
+			//5) Выбираем объекты - на чем и чем будем рисовать
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+			//6) Рисуем фигуру с помощью функции многоугольника Polygon
+
+			::POINT triangle[3] = { {get_start_x(), get_start_y()}, {get_start_x() + b_cattle, get_start_y() + get_height()}, {get_start_x() - a_cattle, get_start_y() + get_height()}};
+			::Polygon(hdc, triangle, 3);
+
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			DeleteObject(hdc);
+
 		}
 		void info() const override
 		{
 			cout << typeid(*this).name() << endl;
-			cout << "Длинна стороны a: " << get_side_one() << endl;
+			cout << (side_one != side_two&& side_one != side_three? "Длинна стороны a:" : "Длинна стороны равностороннего треугольника: ") << get_side_one() << endl;
 			if(side_one != side_two)cout << "Длинна стороны b: " << get_side_two() << endl;
 			if (side_two != side_three)cout << "Длинна стороны c: " << get_side_three() << endl;
 			Shape::info();
 		}
 	};
 
-	class Ellipses :public Shape
+	class Ellipse :public Shape
 	{
-		static const int MIN_SIZE = 5;
-		static const int MAX_SIZE = 50;
-		const double pi = 3.1415926;
+		static const int MIN_SIZE = 20;
+		static const int MAX_SIZE = 500;
+		//const double pi = 3.1415926;
 		double semiaxis_a;
 		double semiaxis_b;
 	public:
@@ -309,7 +323,7 @@ namespace Geometry
 		{
 			this->semiaxis_b = semiaxis_b;
 		}
-		Ellipses(double semiaxis_a, double semiaxis_b, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
+		Ellipse(double semiaxis_a, double semiaxis_b, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
 			if (semiaxis_a < MIN_SIZE) semiaxis_a = MIN_SIZE;
 			if (semiaxis_a > MAX_SIZE) semiaxis_a = MAX_SIZE;
@@ -319,7 +333,7 @@ namespace Geometry
 			set_semiaxis_b(semiaxis_b);
 			//cout << "EConstructor:\t" << this << endl;
 		}
-		Ellipses(double radius, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
+		Ellipse(double radius, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
 		{
 			if (radius < MIN_SIZE) radius = MIN_SIZE;
 			if (radius > MAX_SIZE) radius = MAX_SIZE;
@@ -327,48 +341,55 @@ namespace Geometry
 			set_semiaxis_b(radius);
 			//cout << "CircleConstructor:\t" << this << endl;
 		}
-		~Ellipses()
+		~Ellipse()
 		{
 			//cout << "EDestructor:\t" << this << endl;
 		}
 		double get_area() const override
 		{
-			return round(pi * semiaxis_a * semiaxis_b * 10) / 10;
+			return round(M_PI * semiaxis_a * semiaxis_b * 10) / 10;
 		}
 		double get_perimeter() const override
 		{
-			return round(2 * pi * sqrt((semiaxis_a * semiaxis_a + semiaxis_b * semiaxis_b) / 2) * 10) / 10;
+			return round(2 * M_PI * sqrt((semiaxis_a * semiaxis_a + semiaxis_b * semiaxis_b) / 2) * 10) / 10;
 		}
 		void draw() const override
 		{
 			for (int i = 0; i < semiaxis_a * 2; i++) cout << "\n";
 			//cout << "Рисуем круг, нажмите на любую клавишу" << endl;
-			HWND handle = FindWindowA("ConsoleWindowClass", NULL);
-			HDC hdc = GetDC(handle);
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
 
 			//создаём перо (контур)
-			HPEN hPen = CreatePen(PS_SOLID, 10, color); //сплошная линия, толщиной 10 пикселей, цвет - зеленый
+			HPEN hPen = CreatePen(PS_SOLID, get_line_width(), color); //сплошная линия, толщиной 10 пикселей, цвет - зеленый
 			//создаём кисть (заливка)
-			HBRUSH hBrush = CreateSolidBrush(0x0);//сплошной черный
+			HBRUSH hBrush = CreateSolidBrush(color);
 			SelectObject(hdc, hPen);// указываем перо 
 			SelectObject(hdc, hBrush);//указываем кисть
 			//рисуем эллипс
-			Ellipse(hdc, 500, 20, semiaxis_a * 10 * 2 + 500, semiaxis_b * 10 * 2 + 20);
-			//500,20 -верхний левый semiaxis_a * 10 * 2 + 500, semiaxis_b * 10 * 2 + 20 - нижний правый углы описывающего прямоугольника
+			::Ellipse(hdc, get_start_x(), get_start_y(), get_start_x() + get_semiaxis_a(), get_start_y() + get_semiaxis_b());
+
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			DeleteObject(hdc);
 		}
 		void info() const override
 		{
 			cout << typeid(*this).name() << endl;
-			cout << "Радиус а: " << get_semiaxis_a() << endl;
-			if(semiaxis_a != semiaxis_b)cout << "Радиус b: " << get_semiaxis_a() << endl;
+			cout << (semiaxis_a != semiaxis_b? "Радиус элипса а: ":"Радиус круга: ") << get_semiaxis_a() << endl;
+			if(semiaxis_a != semiaxis_b)cout << "Радиус элипса b: " << get_semiaxis_b() << endl;
 			Shape::info();
 		}
 
 	};
+	class Circle :public Ellipse
+	{
+
+	};
 }
-#define RECTANGLE_MAIN
+//#define RECTANGLE_MAIN
 //#define SQUARE_MAIN
-//#define TRIANGLE_MAIN
+#define TRIANGLE_MAIN
 //#define ELLIPS_MAIN
 //#define CIRCLE_MAIN
 void main()
@@ -376,45 +397,34 @@ void main()
 	setlocale(LC_ALL, "");
 #ifdef RECTANGLE_MAIN
 	//					ПРЯМОУГОЛЬНИК
-	Geometry::Rectangle rect(100, 100, 5, 500, 200, Geometry::Color::blue);
-	cout << delimitr << endl;
-	system("PAUSE");
+	Geometry::Rectangle rect(300, 100, 100, 150, 5, Geometry::Color::blue);
 	rect.info();
 #endif // RECTANGLE_MAIN
 
 
 #ifdef SQUARE_MAIN
 	//					Квадрат
-	cout << delimitr << endl;
-	Geometry::Square square(300, 100, 100, 150, Geometry::Color::red);
-	cout << delimitr << endl;
-	system("PAUSE");
+	Geometry::Square square(200, 100, 150, 5, Geometry::Color::red);
 	square.info();
 #endif // SQUARE_MAIN
 
 
 #ifdef TRIANGLE_MAIN
 	//					Треугольник
-	Geometry::Triangle triangle(11, Geometry::Color::console_blue);
-	cout << delimitr << endl;
-	system("PAUSE");
+	Geometry::Triangle triangle(100, 180, 150, 600, 150, 5, Geometry::Color::blue);
 	triangle.info();
 #endif // TRIANGLE_MAIN
 
 
 #ifdef ELLIPS_MAIN
 	//					Элипс
-	Geometry::Ellipses ellipse(10, 5, Geometry::Color::green);
-	cout << delimitr << endl;
-	system("PAUSE");
+	Geometry::Ellipse ellipse(200, 100, 150, 150, 5, Geometry::Color::green);
 	ellipse.info();
 #endif // ELLIPS_MAIN
 	
 #ifdef CIRCLE_MAIN
 	//					Круг
-	Geometry::Ellipses circle(10, Geometry::Color::green);
-	cout << delimitr << endl;
-	system("PAUSE");
+	Geometry::Ellipse circle(200, 150, 150, 5, Geometry::Color::green);
 	circle.info();
 
 #endif // CIRCLE_MAIN
