@@ -90,101 +90,6 @@ namespace Geometry
 		}
 	};
 
-	class Rectangle :public Shape
-	{
-		static const int MIN_SIDE = 20;
-		static const int MAX_SIDE = 500;
-		double long_side;
-		double width_side;
-	public:
-		Rectangle(double long_side, double width_side, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
-		{
-			set_long_side(long_side);
-			set_width_side(width_side);
-			//cout << "RectangleConstructor:\t" << this << endl;
-		}
-		double get_long_side() const
-		{
-			return long_side;
-		}
-		double get_width_side() const
-		{
-			return width_side;
-		}
-		void set_long_side(double long_side)
-		{
-			if (long_side < MIN_SIDE) long_side = MIN_SIDE;
-			if (long_side > MAX_SIDE) long_side = MAX_SIDE;
-			this->long_side = long_side;
-		}
-		void set_width_side(double width_side)
-		{
-			if (width_side < MIN_SIDE) width_side = MIN_SIDE;
-			if (width_side > MAX_SIDE) width_side = MAX_SIDE;
-			this->width_side = width_side;
-		}
-		double get_area() const override
-		{
-			return long_side * width_side;
-		}
-		double get_perimeter() const override
-		{
-			return (long_side + width_side) * 2;
-		}
-		void draw() const override
-		{
-			//1) Получаем окно консоли
-			HWND hwnd = GetConsoleWindow(); //Получаем окно консоли (Функция GetConsoleWindow() возвращает hwnd окна консоли из текущего потока команд)
-			//HWND - Hangler to Window (Обработчик окна)
-			// К переменной можно обратится по имени, к окну можно обратится через hwnd
-			//2) СОздаем контекст устройства
-			HDC hdc = GetDC(hwnd); // СОздаем контекст устройства
-			// контекст устройства есть у каждого окна
-			// Рисовать можно только на контексте устройства
-			// Функция GetDC(hwnd) возращает контекст устройства заданного окна
-			//3) Создаем кисть и карандаш
-			HPEN hPen = CreatePen(PS_SOLID, 5, color); //карандаш рисует контур фигуры
-			HBRUSH hBrush = CreateSolidBrush(color); //Кисть заливает цветом фигуру
-
-			//4) Выбираем чем и на чем будем рисовать
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
-			//5) Рисуем фигуру
-			::Rectangle(hdc, start_x, start_y, start_x + long_side, start_y + width_side);
-
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-			DeleteObject(hdc);
-			/*HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleTextAttribute(hConsole, color);
-			for (int i = 0; i < width_side; i++)
-			{
-				for (int j = 0; j < long_side; j++)
-				{
-					cout << "* ";
-				}
-				cout << endl;
-			}
-			SetConsoleTextAttribute(hConsole, Color::console_defuult);*/
-		}
-		void info() const override
-		{
-			cout << typeid(*this).name() << endl;
-			cout << (long_side != width_side? "Длинна стороны a: ": "Длинна стороны квадрата: ") << get_long_side() << endl;
-			if(long_side != width_side)cout << "Длинна стороны b: " << get_width_side() << endl;
-			Shape::info();
-		}
-		~Rectangle() {}
-
-	};
-	class Square :public Rectangle
-	{
-	public:
-		Square(double side, SHAPE_TAKE_PARAMETERS) :Rectangle(side, side, SHAPE_GIVE_PARAMETERS){}
-		~Square() {}
-	};
-
 	class Triangle :public Shape
 	{
 		static const int MIN_SIDE = 20;
@@ -319,6 +224,101 @@ namespace Geometry
 		~Triangle_Right() {}
 	};
 
+	class Rectangle :public Shape
+	{
+		static const int MIN_SIDE = 20;
+		static const int MAX_SIDE = 500;
+		double long_side;
+		double width_side;
+	public:
+		Rectangle(double long_side, double width_side, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
+		{
+			set_long_side(long_side);
+			set_width_side(width_side);
+			//cout << "RectangleConstructor:\t" << this << endl;
+		}
+		double get_long_side() const
+		{
+			return long_side;
+		}
+		double get_width_side() const
+		{
+			return width_side;
+		}
+		void set_long_side(double long_side)
+		{
+			if (long_side < MIN_SIDE) long_side = MIN_SIDE;
+			if (long_side > MAX_SIDE) long_side = MAX_SIDE;
+			this->long_side = long_side;
+		}
+		void set_width_side(double width_side)
+		{
+			if (width_side < MIN_SIDE) width_side = MIN_SIDE;
+			if (width_side > MAX_SIDE) width_side = MAX_SIDE;
+			this->width_side = width_side;
+		}
+		double get_area() const override
+		{
+			return long_side * width_side;
+		}
+		double get_perimeter() const override
+		{
+			return (long_side + width_side) * 2;
+		}
+		void draw() const override
+		{
+			//1) Получаем окно консоли
+			HWND hwnd = GetConsoleWindow(); //Получаем окно консоли (Функция GetConsoleWindow() возвращает hwnd окна консоли из текущего потока команд)
+			//HWND - Hangler to Window (Обработчик окна)
+			// К переменной можно обратится по имени, к окну можно обратится через hwnd
+			//2) СОздаем контекст устройства
+			HDC hdc = GetDC(hwnd); // СОздаем контекст устройства
+			// контекст устройства есть у каждого окна
+			// Рисовать можно только на контексте устройства
+			// Функция GetDC(hwnd) возращает контекст устройства заданного окна
+			//3) Создаем кисть и карандаш
+			HPEN hPen = CreatePen(PS_SOLID, 5, color); //карандаш рисует контур фигуры
+			HBRUSH hBrush = CreateSolidBrush(color); //Кисть заливает цветом фигуру
+
+			//4) Выбираем чем и на чем будем рисовать
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+
+			//5) Рисуем фигуру
+			::Rectangle(hdc, start_x, start_y, start_x + long_side, start_y + width_side);
+
+			DeleteObject(hPen);
+			DeleteObject(hBrush);
+			DeleteObject(hdc);
+			/*HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleTextAttribute(hConsole, color);
+			for (int i = 0; i < width_side; i++)
+			{
+				for (int j = 0; j < long_side; j++)
+				{
+					cout << "* ";
+				}
+				cout << endl;
+			}
+			SetConsoleTextAttribute(hConsole, Color::console_defuult);*/
+		}
+		void info() const override
+		{
+			cout << typeid(*this).name() << endl;
+			cout << (long_side != width_side? "Длинна стороны a: ": "Длинна стороны квадрата: ") << get_long_side() << endl;
+			if(long_side != width_side)cout << "Длинна стороны b: " << get_width_side() << endl;
+			Shape::info();
+		}
+		~Rectangle() {}
+
+	};
+	class Square :public Rectangle
+	{
+	public:
+		Square(double side, SHAPE_TAKE_PARAMETERS) :Rectangle(side, side, SHAPE_GIVE_PARAMETERS){}
+		~Square() {}
+	};
+
 	class Ellipse :public Shape
 	{
 		static const int MIN_SIZE = 20;
@@ -407,6 +407,7 @@ namespace Geometry
 //#define CIRCLE_MAIN
 //#define TRIANGLE_EQUILATERAL
 //#define TRIANGLE_ISOSCELES
+//#define TRIANGLE_RIGHT
 
 void main()
 {
@@ -417,20 +418,11 @@ void main()
 	rect.info();
 #endif // RECTANGLE_MAIN
 
-
 #ifdef SQUARE_MAIN
 	//					Квадрат
 	Geometry::Square square(200, 100, 150, 5, Geometry::Color::red);
 	square.info();
 #endif // SQUARE_MAIN
-
-
-#ifdef TRIANGLE_MAIN
-	//					Треугольник
-	Geometry::Triangle triangle(100, 180, 150, 600, 150, 5, Geometry::Color::blue);
-	triangle.info();
-#endif // TRIANGLE_MAIN
-
 
 #ifdef ELLIPS_MAIN
 	//					Элипс
@@ -445,6 +437,12 @@ void main()
 
 #endif // CIRCLE_MAIN
 
+#ifdef TRIANGLE_MAIN
+	//					Треугольник
+	Geometry::Triangle triangle(100, 180, 150, 600, 150, 5, Geometry::Color::blue);
+	triangle.info();
+#endif // TRIANGLE_MAIN
+
 #ifdef TRIANGLE_EQUILATERAL
 	//					Равносторонний треугольник
 	Geometry::Triangle_Equilateral triangle_eq(200, 600, 150, 5, Geometry::Color::red);
@@ -458,8 +456,29 @@ void main()
 	triangle_is.info();
 #endif // TRIANGLE_ISOSCELES
 
+#ifdef TRIANGLE_RIGHT
 	//					Прямоугольный треугольник по 2 катетам
 	Geometry::Triangle_Right triangle_right(100, 150, 600, 150, 5, Geometry::Color::yellow);
 	triangle_right.info();
+#endif // TRIANGLE_RIGHT
+
+	//			Генерация фигур
+	srand( time(0)); // Запуск генерации случайных чисел
+	int gener = rand() % 3;
+	if (gener == 1)
+	{
+		Geometry::Triangle triangle(rand() % 480 + 20, rand() % 480 + 20, rand() % 480 + 20, 600, 150, 5, Geometry::Color::blue);
+		triangle.info();
+	}
+	else if (gener == 2)
+	{
+		Geometry::Rectangle rect(rand() % 480 + 20, rand() % 480 + 20, 100, 150, 5, Geometry::Color::green);
+		rect.info();
+	}
+	else
+	{
+		Geometry::Ellipse elips(rand() % 300 + 20, rand() % 300 + 20, 150, 250, 5, Geometry::Color::yellow);
+		elips.info();
+	}
 
 }
