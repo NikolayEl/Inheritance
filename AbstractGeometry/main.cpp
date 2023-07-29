@@ -84,6 +84,8 @@ namespace Geometry
 		{
 			cout << "Площадь фигуры: " << get_area() << endl;
 			cout << "Периметр фигуры: " << get_perimeter() << endl;
+			system("PAUSE");
+			system("cls");
 			draw();
 		}
 	};
@@ -260,11 +262,8 @@ namespace Geometry
 		}
 		void draw() const override
 		{
-			double base_side = max(max(side_one, side_two), side_three);
-			double one_side = min(min(side_one, side_two), side_three);
-			double two_side = get_perimeter() - base_side - one_side;
-			double a_cattle = round(sqrt((one_side * one_side) - (get_height() * get_height())) * 10) / 10;
-			double b_cattle = base_side - a_cattle;
+			double a_cattle = round(sqrt((get_side_two() * get_side_two()) - (get_height() * get_height())) * 10) / 10;
+			double b_cattle = get_side_one() - a_cattle;
 			//cout << base_side << " " << one_side << " " << two_side << " " << a_cattle << " " << b_cattle << " " << this->get_height() << endl;
 			
 			// Получаем окно консоли
@@ -303,7 +302,6 @@ namespace Geometry
 	{
 		static const int MIN_SIZE = 20;
 		static const int MAX_SIZE = 500;
-		//const double pi = 3.1415926;
 		double semiaxis_a;
 		double semiaxis_b;
 	public:
@@ -332,14 +330,6 @@ namespace Geometry
 			set_semiaxis_a(semiaxis_a);
 			set_semiaxis_b(semiaxis_b);
 			//cout << "EConstructor:\t" << this << endl;
-		}
-		Ellipse(double radius, SHAPE_TAKE_PARAMETERS) :Shape(SHAPE_GIVE_PARAMETERS)
-		{
-			if (radius < MIN_SIZE) radius = MIN_SIZE;
-			if (radius > MAX_SIZE) radius = MAX_SIZE;
-			set_semiaxis_a(radius);
-			set_semiaxis_b(radius);
-			//cout << "CircleConstructor:\t" << this << endl;
 		}
 		~Ellipse()
 		{
@@ -384,14 +374,16 @@ namespace Geometry
 	};
 	class Circle :public Ellipse
 	{
-
+	public:
+		Circle(double radius, SHAPE_TAKE_PARAMETERS): Ellipse(radius, radius, SHAPE_GIVE_PARAMETERS){}
+		~Circle() {}
 	};
 }
 //#define RECTANGLE_MAIN
 //#define SQUARE_MAIN
-#define TRIANGLE_MAIN
+//#define TRIANGLE_MAIN
 //#define ELLIPS_MAIN
-//#define CIRCLE_MAIN
+#define CIRCLE_MAIN
 void main()
 {
 	setlocale(LC_ALL, "");
@@ -424,7 +416,7 @@ void main()
 	
 #ifdef CIRCLE_MAIN
 	//					Круг
-	Geometry::Ellipse circle(200, 150, 150, 5, Geometry::Color::green);
+	Geometry::Circle circle(200, 150, 250, 5, Geometry::Color::green);
 	circle.info();
 
 #endif // CIRCLE_MAIN
