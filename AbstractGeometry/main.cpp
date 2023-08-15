@@ -23,7 +23,40 @@ namespace Geometry
 
 #define SHAPE_TAKE_PARAMETERS	int start_x, int start_y, int line_width, Color color
 #define SHAPE_GIVE_PARAMETERS	start_x, start_y, line_width, color
-
+	class MyConsoleWind
+	{
+		HWND hwnd;
+		HDC hdc;
+		HPEN hPen;
+		HBRUSH hBrush;
+	public:
+		HDC get_hdc() const
+		{
+			return hdc;
+		}
+		MyConsoleWind(const int line_width, Color color)
+		{
+			// Получаем окно консоли
+			hwnd = GetConsoleWindow();
+			//2) Создаем контекст устройства
+			hdc = GetDC(hwnd);
+			//3) Создаем кисть и карандаш
+			hPen = CreatePen(PS_SOLID, line_width, color);
+			//4) Кисть заливает цветом фигуру
+			hBrush = CreateSolidBrush(color);
+			//5) Выбираем объекты - на чем и чем будем рисовать
+			SelectObject(hdc, hPen);
+			SelectObject(hdc, hBrush);
+			//cout << "WindowConstructor:\t" << this << endl;
+		}
+		~MyConsoleWind()
+		{
+			DeleteObject(hBrush);
+			DeleteObject(hPen);
+			DeleteObject(hdc);
+			//cout << "WindowDestructor:\t" << this << endl;
+		}
+	};
 	class Shape
 	{
 		static const int MIN_START_X = 10;
@@ -168,29 +201,11 @@ namespace Geometry
 		{
 			double a_cattle = round(sqrt((get_side_two() * get_side_two()) - (get_height() * get_height())) * 10) / 10;
 			double b_cattle = get_side_one() - a_cattle;
-			//cout << base_side << " " << one_side << " " << two_side << " " << a_cattle << " " << b_cattle << " " << this->get_height() << endl;
-			
-			// Получаем окно консоли
-			HWND hwnd = GetConsoleWindow();
-			//2) Создаем контекст устройства
-			HDC hdc = GetDC(hwnd);
-			//3) Создаем кисть и карандаш
-			HPEN hPen = CreatePen(PS_SOLID, get_line_width(), color);
-			//4) Кисть заливает цветом фигуру
-			HBRUSH hBrush = CreateSolidBrush(color);
-			//5) Выбираем объекты - на чем и чем будем рисовать
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-			//6) Рисуем фигуру с помощью функции многоугольника Polygon
+			MyConsoleWind window(get_line_width(), color);
+			// Рисуем фигуру с помощью функции многоугольника Polygon
 
 			::POINT triangle[3] = { {get_start_x(), get_start_y()}, {get_start_x() + b_cattle, get_start_y() + get_height()}, {get_start_x() - a_cattle, get_start_y() + get_height()}};
-			::Polygon(hdc, triangle, 3);
-
-
-			DeleteObject(hBrush);
-			DeleteObject(hPen);
-			DeleteObject(hdc);
-
+			::Polygon(window.get_hdc(), triangle, 3);
 		}
 		void info() const override
 		{
@@ -267,40 +282,10 @@ namespace Geometry
 		}
 		void draw() const override
 		{
-			//1) Получаем окно консоли
-			HWND hwnd = GetConsoleWindow(); //Получаем окно консоли (Функция GetConsoleWindow() возвращает hwnd окна консоли из текущего потока команд)
-			//HWND - Hangler to Window (Обработчик окна)
-			// К переменной можно обратится по имени, к окну можно обратится через hwnd
-			//2) СОздаем контекст устройства
-			HDC hdc = GetDC(hwnd); // СОздаем контекст устройства
-			// контекст устройства есть у каждого окна
-			// Рисовать можно только на контексте устройства
-			// Функция GetDC(hwnd) возращает контекст устройства заданного окна
-			//3) Создаем кисть и карандаш
-			HPEN hPen = CreatePen(PS_SOLID, get_line_width(), color); //карандаш рисует контур фигуры
-			HBRUSH hBrush = CreateSolidBrush(color); //Кисть заливает цветом фигуру
+			MyConsoleWind window(get_line_width(), color);
 
-			//4) Выбираем чем и на чем будем рисовать
-			SelectObject(hdc, hPen);
-			SelectObject(hdc, hBrush);
-
-			//5) Рисуем фигуру
-			::Rectangle(hdc, get_start_x(), get_start_y(), get_start_x() + get_long_side(), get_start_y() + get_width_side());
-
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-			DeleteObject(hdc);
-			/*HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleTextAttribute(hConsole, color);
-			for (int i = 0; i < width_side; i++)
-			{
-				for (int j = 0; j < long_side; j++)
-				{
-					cout << "* ";
-				}
-				cout << endl;
-			}
-			SetConsoleTextAttribute(hConsole, Color::console_defuult);*/
+			// Рисуем фигуру
+			::Rectangle(window.get_hdc(), get_start_x(), get_start_y(), get_start_x() + get_long_side(), get_start_y() + get_width_side());
 		}
 		void info() const override
 		{
@@ -367,22 +352,9 @@ namespace Geometry
 		void draw() const override
 		{
 			for (int i = 0; i < semiaxis_a * 2; i++) cout << "\n";
-			//cout << "Рисуем круг, нажмите на любую клавишу" << endl;
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-
-			//создаём перо (контур)
-			HPEN hPen = CreatePen(PS_SOLID, get_line_width(), color); //сплошная линия, толщиной 10 пикселей, цвет - зеленый
-			//создаём кисть (заливка)
-			HBRUSH hBrush = CreateSolidBrush(color);
-			SelectObject(hdc, hPen);// указываем перо 
-			SelectObject(hdc, hBrush);//указываем кисть
+			MyConsoleWind window(get_line_width(), color);
 			//рисуем эллипс
-			::Ellipse(hdc, get_start_x(), get_start_y(), get_start_x() + get_semiaxis_a(), get_start_y() + get_semiaxis_b());
-
-			DeleteObject(hBrush);
-			DeleteObject(hPen);
-			DeleteObject(hdc);
+			::Ellipse(window.get_hdc(), get_start_x(), get_start_y(), get_start_x() + get_semiaxis_a(), get_start_y() + get_semiaxis_b());
 		}
 		void info() const override
 		{
